@@ -6,7 +6,7 @@ import mdx from '@mdx-js/rollup';
 import tailwindcss from '@tailwindcss/vite';
 import viteReact from '@vitejs/plugin-react';
 import { nitro } from 'nitro/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
 import { loadEnvFiles } from './src/lib/env.ts';
 
@@ -59,6 +59,42 @@ const buildId =
     }
   })();
 
+// Vite runs in Node rather than workerd. Proxy the configured D1 binding so
+// development can use the same database as Workers when `remote: true` is set.
+function cloudflareDevBindings(): Plugin {
+  return {
+    name: 'cloudflare-dev-bindings',
+    apply: 'serve',
+    async configureServer(server) {
+      if (process.env.DATABASE_PROVIDER !== 'd1' || isCloudflareBuild) return;
+
+      const { getPlatformProxy } = await import('wrangler');
+      const platform = await getPlatformProxy({
+        configPath: 'wrangler.jsonc',
+        remoteBindings: true,
+        persist: false,
+      });
+      if (!platform.env.DB) {
+        await platform.dispose();
+        throw new Error('Configure the D1 binding named DB in wrangler.jsonc.');
+      }
+
+      const globals = globalThis as typeof globalThis & {
+        __CF_ENV__?: Record<string, unknown>;
+      };
+      const bindings = { DB: platform.env.DB };
+      globals.__CF_ENV__ = bindings;
+      server.httpServer?.once('close', () => {
+        if (globals.__CF_ENV__ === bindings) delete globals.__CF_ENV__;
+        void platform.dispose().catch((error: unknown) => {
+          server.config.logger.error(String(error));
+        });
+      });
+      server.config.logger.info('D1 development binding connected.');
+    },
+  };
+}
+
 export default defineConfig({
   define: {
     'import.meta.env.VITE_BUILD_ID': JSON.stringify(
@@ -82,6 +118,7 @@ export default defineConfig({
       : {},
   },
   plugins: [
+    cloudflareDevBindings(),
     // MDX must run before the react plugin so JSX in compiled MDX gets transformed.
     // .claude/ holds agent skills served verbatim (`?raw`) — never compile them.
     {
