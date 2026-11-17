@@ -70,7 +70,7 @@ export async function getDbConfigs(): Promise<ConfigMap> {
 }
 
 /**
- * Get all configs merged: env + database (database overrides env).
+ * Merge env and database settings; the product name stays code-owned.
  */
 export async function getAllConfigs(): Promise<ConfigMap> {
   const dbConfigs = await getDbConfigs();
