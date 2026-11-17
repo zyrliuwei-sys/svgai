@@ -1,24 +1,42 @@
-# Active implementation: preview before payment
+# Preview before payment — implemented
 
-User requirements: monthly plans must cost less for the same credits; show SVG file estimates on every price. Visitors can generate one free preview without registering, shared across text and image modes; downloading requires verified payment. Preserve existing credit accounting and payment integrity.
+Updated 2026-11-17. The application remains local; this work did not deploy the website or process a real purchase.
 
-In progress:
+## Product behavior
 
-- Monthly catalog changed to $7 / $22 / $59 versus one-time $9 / $29 / $79. Credits stay 1,600 / 5,200 / 14,400. Estimates use 160 credits: 10 / 32 / 90 SVGs. Monthly comparison/savings UI added. Need update existing catalog margin test to support the authorized monthly discount (6x provider-cost floor; one-time stays 8x), and test monotonically improving per-credit value.
-- Installed @cf-wasm/resvg, fast-png; @cf-wasm/plugins dev install pending.
-- Added svgPreview and svgPreviewQuota definitions to active SQLite/D1 schema and schema.sqlite template; DB NOT YET SYNCED.
+- One free preview without registration, shared between text and image input. The signed HttpOnly visitor session recovers the preview after refresh; signing in binds it to the account.
+- Only a private PNG preview reaches an unpaid visitor. SVG download, source copying and generated outline access require a verified, non-refunded SVG purchase. Signup credits or admin-granted credits alone do not unlock exports.
+- First unlock deducts the displayed credit cost atomically. Repeat exports of that result reuse the completed task without another deduction. Image conversion costs 160 credits; text generation settles to provider usage multiplied by 8.
+- Browser uploads are validated and resized to a bounded PNG. Tracing and raster preview rendering run on the server. Successful previews discard the temporary source image.
+- Preview intent survives pricing, sign-in and the checkout return. Image requests persist only a fingerprint and idempotency identifier for safe network retries; completed results can be recovered by task ID.
 
-Implementation design:
+## Prices
 
-- Signed HttpOnly visitor cookie (HMAC with existing AUTH_SECRET), durable one-preview claim unique by visitor and nullable unique user ID. Bind preview to authenticated user on sign-in, reject cross-account access. Hash IP for persistent daily counters (3/IP, configurable global limit), plus IP/user rate limits. Concurrent requests use atomic guards and provider idempotency keys.
-- SVG sources stay on server; use Resvg WASM to rasterize PNG previews. No raw SVG/outline/code response for unpaid preview. A preview PNG endpoint must check visitor/account ownership and no-store. Public demo samples remain public, but UI download/copy invokes paywall until paid.
-- Browser normalizes uploaded PNG/JPEG/WebP to a bounded PNG (512px) WITHOUT tracing or generating any SVG. Server decodes PNG with fast-png, traces via existing ImageTracerJS, sanitizes, caps SVG size, rasterizes. Pending preview stores normalized image in options, clears it once complete to keep each D1 row under 2MB.
-- Existing paid text generation keeps actual provider usage ×8. Paid image conversion costs 160 credits. Need a new ai-tasks atomic helper that creates a completed SVG task and deducts credits together (unique deterministic task/ledger ID) for image conversion and free-preview export unlock. It should not create a fake payment/order.
-- A verified non-refunded paid order for one of the six SVG products is required for generation after the trial and ALL generated SVG exports. Admin credits/free signup credits alone do not grant paid entitlement. Existing paid task GET must enforce this too.
-- Export trial: first bind owner, then atomic completed-task/credit consumption keyed to preview ID; replay returns same successful task without charging twice. Repeat downloads do not spend more credits.
-- Frontend: preserve existing paid text retry/recovery logic. Add guest trial branch and raster-only result state. Disable/gate code/outline/palette until unlock; paywall dialog on download/copy, shared with expanded view. No signup before first generation. Paid image branch calls server. Restore trial across refresh/sign-in via cookie. Pricing carries preview intent through sign-in/checkout and returns to generator after purchase, using server-confirmed paid state.
-- Timeline: custom source for bound preview rows, register server-only svg_preview event label. Update all copy/privacy docs that currently claim free unlimited browser-only image tracing.
+| Tier    | One-time | Monthly | Credits | Estimated SVG files |
+| ------- | -------: | ------: | ------: | ------------------: |
+| Starter |       $9 |      $7 |   1,600 |                  10 |
+| Pro     |      $29 |     $22 |   5,200 |                  32 |
+| Studio  |      $79 |     $59 |  14,400 |                  90 |
 
-Still required: implement services/routes/UI, sync additive D1 tables (site remains undeployed), local isolated atomic tests and D1 path tests, browser anonymous preview/paywall/no raw SVG leakage checks, paid fixture tests, production build/typecheck and Cloudflare WASM build/runtime validation. No real checkout or fake paid records in live DB. Test with a separate anonymous cookie jar/127.0.0.1 host to avoid consuming the user's browser trial.
+File estimates use 160 credits per SVG. Actual text generation usage varies. Larger tiers improve per-credit value in both billing groups. Monthly credits expire at the billing-period end; one-time credits do not expire.
 
-Environment: local preview http://localhost:3001, remote D1 svgai id 359821ff-63dc-414d-b9f9-55b7982269a3, R2 configured via encrypted D1 admin settings. Existing source has concurrent unrelated edits; preserve them. No deployment requested by latest task. Main site has not been reachable; CDN cdn.aisvg-generator.com is live. Read /Users/wl./.agents/skills/ego-browser/SKILL.md and run ego-browser skill before browser work. New browser goal gets a new TaskSpace (prior space 53 finished, user kept logo preview). No proactive subagents unless explicitly requested by user or applicable skill.
+## Data and enforcement
+
+The additive `scripts/sql/svg-preview.sql` was applied to the existing shared development D1 `svgai`. Both SQLite/D1 schema definitions include the new preview and quota tables. Existing data was preserved. The site is not deployed.
+
+Claims use atomic batches with unique visitor/account indexes, a persistent keyed network/browser claim, a 3-attempt daily IP allowance and a site-wide daily attempt cap. `SVG_FREE_PREVIEW_DAILY_LIMIT` defaults to 100 and is documented in `.env.example`. Failed jobs have bounded retries. No raw IP or browser identifier is stored in these quota records.
+
+Anonymous checks cannot prove a person's identity across every device and network. Cookies, account binding and network/browser hashes enforce the allowance within the available identity signals. The Privacy Policy describes this limitation and the actual processing/storage behavior.
+
+## Verification
+
+- `pnpm test:svg`: 45 tests passed, including provider-mocked anonymous text generation, isolated preview claims, concurrent unlocks, credit replay, malformed PNG rejection and existing SVG billing/vector tests.
+- `pnpm test:svg:d1`: 27 tests passed using isolated local D1 batches. No fake paid orders were inserted into the shared live D1.
+- `pnpm exec tsc --noEmit`: passed.
+- `pnpm build` and `pnpm cf:build`: passed. Cloudflare output emits a compiled Resvg WASM module through Nitro. The emitted renderer was exercised in local workerd and returned a valid PNG (HTTP 200).
+- Browser: anonymous image preview, refresh recovery, unpaid export HTTP 402, PNG content type, no SVG source in preview metadata, code paywall, preview intent through sign-in, monthly prices/counts and 390px layouts verified. Another session cannot read the private preview (HTTP 404).
+- Existing R2 and logo verification are recorded separately in `docs/storage-r2.md` and `docs/brand/LOGO-COMPATIBILITY.md`.
+
+## Remaining external configuration
+
+Stripe, Creem and PayPal are currently disabled in public configuration. Checkout and payment settlement code remain connected to the server catalog, but no real payment was attempted. Enable and configure a payment provider in the admin panel before accepting purchases. AI text integration was tested with a provider mock, without spending credits on a live generation during this change.

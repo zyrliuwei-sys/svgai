@@ -6,7 +6,9 @@ import {
 } from '@/server/svg-previews';
 import { parseImageInput } from '@/server/svg-renderer';
 
+import { seeApiCredentials } from '@/core/ai/seeapi-generation';
 import { envConfigs } from '@/config';
+import { getAllConfigs } from '@/modules/config/service';
 import { parseSvgInput } from '@/modules/svg-generator/service';
 import { claimPreview, PreviewError } from '@/modules/svg-previews/service';
 import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
@@ -138,6 +140,11 @@ async function POST({ request }: { request: Request }) {
         headers: responseHeaders,
       });
     }
+    if (input.mode === 'text' && !seeApiCredentials(await getAllConfigs()))
+      return respErr(m['svgai.api.unavailable'](), {
+        status: 503,
+        headers: responseHeaders,
+      });
     const row = await claimPreview({
       visitorHash: viewer.visitorHash,
       userId: viewer.userId,
