@@ -3,6 +3,8 @@ import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { brandName } from '../src/config/brand.ts';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const mode = process.argv[2];
 if (!['build', 'deploy'].includes(mode)) {
@@ -15,6 +17,7 @@ const config = JSON.parse(
   readFileSync(resolve(root, 'cloudflare/production.json'), 'utf8')
 );
 config.$schema = 'node_modules/wrangler/config-schema.json';
+config.vars.VITE_APP_NAME = brandName;
 writeFileSync(
   resolve(root, 'wrangler.jsonc'),
   JSON.stringify(config, null, 2) + '\n'
@@ -49,6 +52,8 @@ function run(command, args) {
   if (result.status !== 0) process.exit(result.status || 1);
 }
 
+run(process.execPath, ['scripts/generate-brand-assets.mjs']);
 run(process.execPath, ['scripts/db-setup.mjs']);
 run('pnpm', ['exec', 'vite', 'build']);
+run(process.execPath, ['scripts/check-brand-build.mjs']);
 if (mode === 'deploy') run('pnpm', ['exec', 'wrangler', 'deploy']);

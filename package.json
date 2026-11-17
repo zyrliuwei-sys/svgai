@@ -5,9 +5,11 @@
   "packageManager": "pnpm@11.15.1",
   "type": "module",
   "scripts": {
+    "predev": "node scripts/generate-brand-assets.mjs",
     "dev": "vite dev --port 3000",
-    "prebuild": "node scripts/db-setup.mjs",
+    "prebuild": "node scripts/generate-brand-assets.mjs && node scripts/db-setup.mjs",
     "build": "vite build",
+    "postbuild": "node scripts/check-brand-build.mjs",
     "start": "node .output/server/index.mjs",
     "cf:build": "node scripts/cloudflare.mjs build",
     "cf:deploy": "node scripts/cloudflare.mjs deploy",

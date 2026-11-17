@@ -19,6 +19,7 @@ export function productPageHead({
   article?: { publishedAt: string; author?: string };
 }) {
   const appName = envConfigs.app_name;
+  const pageTitle = title.includes(appName) ? title : `${title} | ${appName}`;
   const url = new URL(path, SITE_URL).href;
   const data: Record<string, unknown>[] = [
     {
@@ -32,7 +33,7 @@ export function productPageHead({
       '@type': 'WebPage',
       '@id': `${url}#page`,
       url,
-      name: title,
+      name: pageTitle,
       description,
       inLanguage: 'en',
       isPartOf: { '@id': `${SITE_URL}/#website` },
@@ -59,7 +60,7 @@ export function productPageHead({
   if (article)
     data.push({
       '@type': 'BlogPosting',
-      headline: title,
+      headline: pageTitle,
       description,
       datePublished: article.publishedAt,
       image,
@@ -70,15 +71,15 @@ export function productPageHead({
     });
   return {
     meta: [
-      { title },
+      { title: pageTitle },
       { name: 'description', content: description },
-      { property: 'og:title', content: title },
+      { property: 'og:title', content: pageTitle },
       { property: 'og:description', content: description },
       { property: 'og:type', content: article ? 'article' : 'website' },
       { property: 'og:site_name', content: appName },
       { property: 'og:url', content: url },
       { property: 'og:image', content: image },
-      { property: 'og:image:alt', content: title },
+      { property: 'og:image:alt', content: pageTitle },
       ...(image === SITE_IMAGE
         ? [
             { property: 'og:image:width', content: '1200' },
@@ -86,7 +87,7 @@ export function productPageHead({
           ]
         : []),
       { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: title },
+      { name: 'twitter:title', content: pageTitle },
       { name: 'twitter:description', content: description },
       { name: 'twitter:image', content: image },
     ],

@@ -10,7 +10,6 @@
   "vars": {
     "DATABASE_PROVIDER": "d1",
     "VITE_APP_URL": "https://aisvg-generator.com",
-    "VITE_APP_NAME": "{{BRAND}}",
     "SVG_FREE_PREVIEW_DAILY_LIMIT": "100"
   },
   "routes": [

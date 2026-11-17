@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
+import { brandName } from '@/config/brand';
 import { productPageHead } from '@/lib/seo';
 import { m } from '@/paraglide/messages.js';
 import { FAQ } from '@/blocks/faq';
@@ -40,7 +41,7 @@ export const Route = createFileRoute('/')({
   head: () =>
     productPageHead({
       path: '/',
-      title: m['svgai.metadata.title'](),
+      title: m['svgai.metadata.title']({ brand: brandName }),
       description: m['svgai.metadata.description'](),
       application: true,
     }),

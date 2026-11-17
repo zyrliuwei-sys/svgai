@@ -1,6 +1,7 @@
 import { ArrowRight, ChevronRight } from 'lucide-react';
 
 import { Link } from '@/core/i18n/navigation';
+import { brandName } from '@/config/brand';
 import { m } from '@/paraglide/messages.js';
 import { Footer } from '@/blocks/footer';
 import { Header } from '@/blocks/header';
@@ -44,7 +45,7 @@ function ToolPage({ image = false }: { image?: boolean }) {
             <p>
               {image
                 ? m['svgai.inner.image.detail_text']()
-                : m['svgai.inner.text.detail_text']()}
+                : m['svgai.inner.text.detail_text']({ brand: brandName })}
             </p>
             {!image && (
               <p className="svg-availability-note">

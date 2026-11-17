@@ -74,7 +74,7 @@ export async function getDbConfigs(): Promise<ConfigMap> {
  */
 export async function getAllConfigs(): Promise<ConfigMap> {
   const dbConfigs = await getDbConfigs();
-  return { ...envConfigs, ...dbConfigs };
+  return { ...envConfigs, ...dbConfigs, app_name: envConfigs.app_name };
 }
 
 /**
