@@ -16,6 +16,7 @@ export function Footer() {
                 alt=""
                 width={29}
                 height={29}
+                loading="lazy"
               />
               <span>{envConfigs.app_name}</span>
             </Link>

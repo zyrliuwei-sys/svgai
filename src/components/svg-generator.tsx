@@ -40,6 +40,7 @@ import { Link, useRouter } from '@/core/i18n/navigation';
 import { ApiError, apiGet, apiPost } from '@/lib/api-client';
 import {
   getSvgStats,
+  inspectRaster,
   outlineSvg,
   prepareImagePng,
   recolorSvg,
@@ -113,6 +114,10 @@ export function SvgGenerator({
   const [comparisonPosition, setComparisonPosition] = useState(50);
   const [file, setFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState('');
+  const [imageDimensions, setImageDimensions] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const [removeBackground, setRemoveBackground] = useState(true);
   const [colorCount, setColorCount] = useState(8);
   const [dragging, setDragging] = useState(false);
@@ -610,13 +615,34 @@ export function SvgGenerator({
     return () => window.removeEventListener('svgai:load-sample', listener);
   });
   useEffect(() => {
+    let active = true;
+    setImageUrl('');
+    setImageDimensions(null);
     if (!file) {
-      setImageUrl('');
       return;
     }
     const url = URL.createObjectURL(file);
-    setImageUrl(url);
-    return () => URL.revokeObjectURL(url);
+    void file
+      .arrayBuffer()
+      .then(async (bytes) => {
+        inspectRaster(new Uint8Array(bytes), file.type);
+        const bitmap = await createImageBitmap(file);
+        try {
+          if (active) {
+            setImageDimensions({ width: bitmap.width, height: bitmap.height });
+            setImageUrl(url);
+          }
+        } finally {
+          bitmap.close();
+        }
+      })
+      .catch(() => {
+        if (active) setError(copy.invalid_file);
+      });
+    return () => {
+      active = false;
+      URL.revokeObjectURL(url);
+    };
   }, [file]);
   useEffect(
     () => () => {
@@ -958,6 +984,8 @@ export function SvgGenerator({
                       className="svg-upload-preview"
                       src={imageUrl}
                       alt={copy.uploaded_image}
+                      width={imageDimensions!.width}
+                      height={imageDimensions!.height}
                     />
                     <span className="svg-file-name">{file.name}</span>
                     <button
@@ -1193,6 +1221,9 @@ export function SvgGenerator({
                 colorSrc={artworkUrl}
                 outlineSrc={outlineArtworkUrl}
                 alt={copy.preview_alt}
+                width={stats.width}
+                height={stats.height}
+                priority
                 copy={comparisonCopy}
                 value={comparisonPosition}
                 onValueChange={setComparisonPosition}
@@ -1322,6 +1353,8 @@ export function SvgGenerator({
               colorSrc={artworkUrl}
               outlineSrc={outlineArtworkUrl}
               alt={copy.preview_alt}
+              width={stats.width}
+              height={stats.height}
               copy={comparisonCopy}
               value={comparisonPosition}
               onValueChange={setComparisonPosition}

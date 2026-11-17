@@ -4,14 +4,21 @@
   "account_id": "d7c3d8fa2229ed65b03fd28fc8659989",
   "compatibility_date": "2026-10-01",
   "compatibility_flags": ["nodejs_compat"],
-  "observability": { "enabled": true },
+  "observability": {
+    "enabled": true
+  },
   "vars": {
     "DATABASE_PROVIDER": "d1",
     "VITE_APP_URL": "https://aisvg-generator.com",
-    "VITE_APP_NAME": "svgai",
+    "VITE_APP_NAME": "{{BRAND}}",
     "SVG_FREE_PREVIEW_DAILY_LIMIT": "100"
   },
-  "routes": [{ "pattern": "aisvg-generator.com", "custom_domain": true }],
+  "routes": [
+    {
+      "pattern": "aisvg-generator.com",
+      "custom_domain": true
+    }
+  ],
   "d1_databases": [
     {
       "binding": "DB",

@@ -18,6 +18,8 @@ export function SvgComparison({
   colorSrc,
   outlineSrc,
   alt,
+  width,
+  height,
   copy,
   className,
   value,
@@ -25,10 +27,13 @@ export function SvgComparison({
   scale = 1,
   disabled = false,
   loading = 'eager',
+  priority = false,
 }: {
   colorSrc: string;
   outlineSrc: string;
   alt: string;
+  width: number;
+  height: number;
   copy: SvgComparisonCopy;
   className?: string;
   value?: number;
@@ -36,6 +41,7 @@ export function SvgComparison({
   scale?: number;
   disabled?: boolean;
   loading?: 'eager' | 'lazy';
+  priority?: boolean;
 }) {
   const hintId = useId();
   const [position, setPosition] = useState(50);
@@ -55,9 +61,12 @@ export function SvgComparison({
         <img
           className="svg-comparison-image svg-comparison-outline"
           src={outlineSrc}
+          width={width}
+          height={height}
           alt=""
           draggable={false}
           loading={loading}
+          fetchPriority={priority ? 'high' : undefined}
           decoding="async"
         />
       </div>
@@ -65,9 +74,12 @@ export function SvgComparison({
         <img
           className="svg-comparison-image"
           src={colorSrc}
+          width={width}
+          height={height}
           alt=""
           draggable={false}
           loading={loading}
+          fetchPriority={priority ? 'high' : undefined}
           decoding="async"
         />
       </div>

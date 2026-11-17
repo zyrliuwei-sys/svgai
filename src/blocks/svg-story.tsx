@@ -29,8 +29,16 @@ export function SvgIntroduction() {
         </div>
       </div>
       <div className="svg-story-prose">
-        <p>{m['svgai.seo.intro_one']()}</p>
-        <p>{m['svgai.seo.intro_two']()}</p>
+        <p>
+          {m['svgai.seo.intro_one']()} {m['svgai.seo.text_context']()}{' '}
+          <Link href="/text-to-svg">{m['svgai.marketing.nav_text']()}</Link>{' '}
+          {m['svgai.seo.text_context_end']()}
+        </p>
+        <p>
+          {m['svgai.seo.intro_two']()} {m['svgai.seo.image_context']()}{' '}
+          <Link href="/image-to-svg">{m['svgai.marketing.nav_image']()}</Link>{' '}
+          {m['svgai.seo.image_context_end']()}
+        </p>
       </div>
     </section>
   );
@@ -58,13 +66,25 @@ export function SvgUseCases() {
     <section className="svgai-container svg-uses">
       <h2>{m['svgai.seo.uses_title']()}</h2>
       <div className="svg-use-list">
-        {items.map(({ Icon, title, text }) => (
+        {items.map(({ Icon, title, text }, index) => (
           <article key={title}>
             <div className="svg-use-title">
               <Icon size={23} strokeWidth={1.4} />
               <h3>{title}</h3>
             </div>
-            <p>{text}</p>
+            <p>
+              {text}
+              {index === 0 && (
+                <>
+                  {' '}
+                  {m['svgai.seo.examples_context']()}{' '}
+                  <Link href="/examples">
+                    {m['svgai.marketing.nav_examples']()}
+                  </Link>{' '}
+                  {m['svgai.seo.examples_context_end']()}
+                </>
+              )}
+            </p>
           </article>
         ))}
       </div>
@@ -108,7 +128,11 @@ export function SvgClosing() {
     <section className="svgai-container svg-closing">
       <div>
         <h2>{m['svgai.seo.cta_title']()}</h2>
-        <p>{m['svgai.seo.cta_text']()}</p>
+        <p>
+          {m['svgai.seo.cta_text']()} {m['svgai.seo.pricing_context']()}{' '}
+          <Link href="/pricing">{m['svgai.seo.pricing_link']()}</Link>{' '}
+          {m['svgai.seo.pricing_context_end']()}
+        </p>
       </div>
       <Link href="/#generator" className="svg-brand-button">
         {m['svgai.seo.cta_action']()}

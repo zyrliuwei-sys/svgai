@@ -2,7 +2,7 @@ import { useId, useMemo, useState } from 'react';
 import type { SvgSample, SvgStyle } from '@/types/svg-generator';
 import { ArrowUpRight, ChevronsLeftRight } from 'lucide-react';
 
-import { outlineSvg, svgToDataUrl } from '@/lib/svg-vectorizer';
+import { getSvgStats, outlineSvg, svgToDataUrl } from '@/lib/svg-vectorizer';
 import {
   SvgComparison,
   type SvgComparisonCopy,
@@ -41,6 +41,7 @@ export function SvgExampleGallery({
     () =>
       samples.map((sample) => ({
         ...sample,
+        dimensions: getSvgStats(sample.svg),
         colorUrl: svgToDataUrl(sample.svg),
         outlineUrl: svgToDataUrl(outlineSvg(sample.svg)),
       })),
@@ -105,6 +106,8 @@ export function SvgExampleGallery({
                 colorSrc={sample.colorUrl}
                 outlineSrc={sample.outlineUrl}
                 alt={sample.title}
+                width={sample.dimensions.width}
+                height={sample.dimensions.height}
                 copy={copy.comparison}
                 scale={1.16}
                 loading="lazy"

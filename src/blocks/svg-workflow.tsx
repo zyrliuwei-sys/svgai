@@ -6,6 +6,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 
+import { Link } from '@/core/i18n/navigation';
 import { SVG_SAMPLES } from '@/lib/svg-samples';
 import { m } from '@/paraglide/messages.js';
 
@@ -36,6 +37,11 @@ export function SvgWorkflow() {
     >
       <div className="svgai-section-intro">
         <h2>{m['svgai.marketing.workflow_title']()}</h2>
+        <p>
+          {m['svgai.seo.how_context']()}{' '}
+          <Link href="/how-it-works">{m['svgai.seo.how_link']()}</Link>{' '}
+          {m['svgai.seo.how_context_end']()}
+        </p>
       </div>
       <ol className="svgai-workflow">
         {steps.map(({ icon: Icon, title, description }, index) => (
