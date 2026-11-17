@@ -1,6 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="Logo">
-  <rect width="512" height="512" rx="112" fill="#0a0a0a"/>
-  <rect x="128" y="128" width="112" height="256" rx="28" fill="#ffffff"/>
-  <rect x="272" y="128" width="112" height="112" rx="28" fill="#ffffff"/>
-  <rect x="272" y="272" width="112" height="112" rx="28" fill="#ffffff"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><rect width="48" height="48" rx="11" fill="#3159ef"/><path d="M34 13H22C9 13 11 25 24 24C37 23 39 36 26 36H14" fill="none" stroke="#fafcff" stroke-width="3.3" stroke-linecap="round"/><path d="M34 7v12M8 36h12" stroke="#fafcff" stroke-opacity=".35"/><circle cx="34" cy="13" r="3" fill="#eef2aa"/><circle cx="14" cy="36" r="3" fill="#eef2aa"/></svg>

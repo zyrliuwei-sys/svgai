@@ -9,6 +9,7 @@ import { MessageSquare, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { tDynamic } from '@/core/i18n/dynamic';
+import { envConfigs } from '@/config';
 import { apiGet, apiPatch, apiPost, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
@@ -279,6 +280,7 @@ function TicketsPage() {
           variant="ghost"
           size="icon"
           className="size-7"
+          aria-label={m['settings.tickets.view']()}
           onClick={() => openDetail(r)}
         >
           <MessageSquare className="size-4" />
@@ -482,6 +484,7 @@ function TicketsPage() {
                 rows={3}
                 onChange={(e) => setReply(e.target.value)}
                 placeholder={m['settings.tickets.reply_placeholder']()}
+                aria-label={m['settings.tickets.reply_placeholder']()}
               />
               <ImageUploader
                 key={replyUploaderKey}
@@ -519,6 +522,11 @@ function TicketsPage() {
 }
 
 export const Route = createFileRoute('/settings/tickets')({
+  head: () => ({
+    meta: [
+      { title: m['settings.tickets.title']() + ' | ' + envConfigs.app_name },
+    ],
+  }),
   component: () => (
     <FeatureGate feature="tickets">
       <TicketsPage />

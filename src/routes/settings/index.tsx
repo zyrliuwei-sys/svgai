@@ -13,6 +13,7 @@ import {
 
 import { useSession } from '@/core/auth/client';
 import { Link } from '@/core/i18n/navigation';
+import { envConfigs } from '@/config';
 import { apiGet, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
@@ -313,13 +314,19 @@ function DashboardPage() {
 
   return (
     <div className="space-y-6 p-4 md:p-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">
-          {m['settings.nav.overview']()}
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm">
-          {name ? m['settings.welcome']({ name }) : ' '}
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {m['settings.nav.overview']()}
+          </h1>
+          <p className="text-muted-foreground mt-1 text-sm">
+            {name ? m['settings.welcome']({ name }) : ' '}
+          </p>
+        </div>
+        <Link href="/#generator" className={buttonVariants()}>
+          <Sparkles className="size-4" />
+          {m['svgai.dashboard.create']()}
+        </Link>
       </div>
 
       {statCards > 0 && (
@@ -485,5 +492,10 @@ function DashboardPage() {
 }
 
 export const Route = createFileRoute('/settings/')({
+  head: () => ({
+    meta: [
+      { title: m['settings.nav.overview']() + ' | ' + envConfigs.app_name },
+    ],
+  }),
   component: DashboardPage,
 });

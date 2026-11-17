@@ -10,7 +10,7 @@ WORKDIR /app
 
 # Copy package manifests, build config, and ALL dialect templates so the
 # postinstall hook can stamp out a matching schema.ts during install.
-COPY package.json pnpm-lock.yaml* vite.config.ts ./
+COPY package.json pnpm-lock.yaml* pnpm-workspace.yaml vite.config.ts ./
 COPY scripts/db-setup.mjs scripts/db-setup.mjs
 COPY src/config/db/schema.sqlite.ts src/config/db/schema.sqlite.ts
 COPY src/config/db/schema.postgres.ts src/config/db/schema.postgres.ts
@@ -29,7 +29,19 @@ FROM deps AS builder
 
 WORKDIR /app
 
-# NODE_ENV=production so loadEnvFiles() in vite.config.ts reads .env.production
+# Only public browser configuration belongs in build arguments.
+ARG VITE_APP_URL=http://localhost:3000
+ARG VITE_APP_NAME=svgai
+ARG VITE_APP_DESCRIPTION="Turn words and images into editable SVG artwork with svgai."
+ARG VITE_APP_LOGO=/logo.svg
+ARG VITE_DEFAULT_LOCALE=en
+ARG VITE_BUILD_ID
+ENV VITE_APP_URL=${VITE_APP_URL} \
+    VITE_APP_NAME=${VITE_APP_NAME} \
+    VITE_APP_DESCRIPTION=${VITE_APP_DESCRIPTION} \
+    VITE_APP_LOGO=${VITE_APP_LOGO} \
+    VITE_DEFAULT_LOCALE=${VITE_DEFAULT_LOCALE} \
+    VITE_BUILD_ID=${VITE_BUILD_ID}
 ENV NODE_ENV=production
 
 COPY . .

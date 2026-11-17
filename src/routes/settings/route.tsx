@@ -20,6 +20,7 @@ import { AppLayout } from '@/components/app-layout';
 import type { NavItem } from '@/components/app-sidebar';
 
 export const Route = createFileRoute('/settings')({
+  head: () => ({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] }),
   component: SettingsLayout,
 });
 

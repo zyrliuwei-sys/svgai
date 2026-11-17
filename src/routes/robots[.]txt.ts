@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-import { serverSiteOrigin } from '@/lib/site-origin';
+import { SITE_URL } from '@/config/site';
 
 export const Route = createFileRoute('/robots.txt')({
   server: {
@@ -12,9 +12,16 @@ export const Route = createFileRoute('/robots.txt')({
           'Disallow: /admin',
           'Disallow: /settings',
           'Disallow: /api/',
+          'Disallow: /sign-in',
+          'Disallow: /sign-up',
+          'Disallow: /forgot-password',
+          'Disallow: /reset-password',
+          'Disallow: /verify-email',
+          'Disallow: /auth-callback',
+          'Disallow: /redeem-invite',
           'Disallow: /*?*',
           '',
-          `Sitemap: ${serverSiteOrigin()}/sitemap.xml`,
+          `Sitemap: ${SITE_URL}/sitemap.xml`,
           '',
         ].join('\n');
         return new Response(body, {

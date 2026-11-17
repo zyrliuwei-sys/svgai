@@ -1,0 +1,833 @@
+/* svgai visual system: precise geometry, cobalt ink and an open canvas. */
+.svgai-page {
+  font-family: var(--font-sans);
+}
+.svgai-page :is(h1, h2, h3),
+.svgai-brand {
+  font-family: var(--font-display);
+}
+.svgai-page :is(h1, h2, h3) {
+  text-wrap: balance;
+}
+.svgai-page h1 {
+  font-weight: 550;
+}
+.svgai-page h2 {
+  letter-spacing: -0.045em;
+  font-weight: 500;
+}
+.svgai-page h3 {
+  letter-spacing: -0.025em;
+}
+.svgai-page .svgai-container {
+  width: min(1240px, calc(100% - 80px));
+}
+.svgai-page .svgai-header {
+  background: color-mix(in oklch, var(--background) 94%, transparent);
+}
+.svgai-page .svgai-header-inner {
+  height: 76px;
+}
+.svgai-page .svgai-brand {
+  letter-spacing: -1.6px;
+  font-size: 28px;
+  font-weight: 650;
+  gap: 10px;
+}
+.svgai-page .svgai-brand img {
+  width: 34px;
+  height: 34px;
+}
+.svgai-page .svgai-desktop-nav {
+  margin-left: 45px;
+}
+.svgai-page .svgai-desktop-nav a {
+  font-size: 12px;
+  padding-inline: 16px;
+}
+.svgai-page .svgai-sign-in {
+  min-height: 38px;
+  border-radius: 5px;
+  padding-inline: 18px;
+}
+.svgai-page .svg-hero {
+  padding-top: 45px;
+  padding-bottom: 68px;
+}
+.svgai-page .svg-hero-intro {
+  margin-bottom: 31px;
+}
+.svgai-page .svg-hero-kicker {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  font-weight: 650;
+  margin-bottom: 17px;
+}
+.svgai-page .svg-hero h1 {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 4.7vw, 66px);
+  font-weight: 550;
+  line-height: 1.07;
+  letter-spacing: -0.065em;
+  max-width: 1180px;
+}
+.svgai-page .svg-hero h1 em {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 550;
+  letter-spacing: inherit;
+}
+.svgai-page .svg-hero-intro > p {
+  font-size: 15px;
+  line-height: 1.7;
+  max-width: 780px;
+  margin-top: 18px;
+}
+.svgai-page .svg-generator {
+  border-radius: 9px;
+  box-shadow: 0 14px 44px color-mix(in oklch, var(--foreground) 4%, transparent);
+}
+.svgai-page .svg-input-tabs {
+  height: 51px;
+}
+.svgai-page .svg-input-tabs > button.is-active {
+  color: var(--svg-accent);
+  border-bottom-color: var(--svg-accent);
+}
+.svgai-page .svg-input-body {
+  padding: 25px;
+}
+.svgai-page .svg-field-heading,
+.svgai-page .svg-style-field legend {
+  font-size: 12px;
+}
+.svgai-page .svg-prompt-box {
+  border-radius: 5px;
+}
+.svgai-page .svg-style-options button {
+  border-radius: 5px;
+}
+.svgai-page .svg-generate-button {
+  min-height: 44px;
+  border-radius: 5px;
+}
+.svgai-page .svg-output-top {
+  min-height: 51px;
+}
+.svgai-page .svg-artboard {
+  background-size: 26px 26px;
+}
+.svgai-page .svg-artboard-corner {
+  border-color: var(--svg-cobalt);
+  opacity: 0.8;
+}
+.svgai-page .svgai-section-intro h2 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3vw, 39px);
+  line-height: 1.15;
+  letter-spacing: -0.05em;
+  max-width: 780px;
+  font-weight: 500;
+}
+.svgai-page .svgai-section-intro > p {
+  max-width: 720px;
+  line-height: 1.8;
+}
+.svgai-page .svgai-showcase {
+  padding-block: 64px 76px;
+}
+.svgai-page .svgai-sample {
+  border-radius: 7px;
+}
+.svgai-page .svgai-sample-art {
+  aspect-ratio: 1.15;
+}
+.svgai-page .svgai-sample-caption {
+  padding: 18px;
+}
+.svgai-page .svgai-sample-caption strong {
+  font-size: 13px;
+}
+.svgai-page .svgai-sample-caption > span > span {
+  font-size: 11px;
+}
+.svgai-page .svgai-workflow-section {
+  padding-block: 62px 76px;
+}
+.svgai-page .svgai-step-icon {
+  border-radius: 6px;
+  background: var(--card);
+}
+.svgai-page .svgai-workflow h3 {
+  font-size: 17px;
+  line-height: 1.3;
+}
+.svgai-page .svgai-workflow p {
+  font-size: 13px;
+  line-height: 1.8;
+}
+.svgai-page .svgai-benefit {
+  border-radius: 7px;
+}
+.svgai-page .svgai-benefit-copy h3 {
+  font-family: var(--font-display);
+  font-size: 35px;
+  letter-spacing: -0.045em;
+  font-weight: 500;
+}
+.svgai-page .svgai-benefit-copy p {
+  font-size: 14px;
+  line-height: 1.8;
+}
+.svgai-page .svgai-benefit-privacy {
+  background: var(--svg-lemon);
+  border-color: color-mix(in oklch, var(--svg-lemon-ink) 16%, var(--svg-lemon));
+  color: var(--svg-lemon-ink);
+}
+.svgai-page .svgai-benefit-privacy :is(p, svg) {
+  color: var(--svg-lemon-ink);
+}
+.svgai-page .svgai-faq {
+  padding-block: 70px 85px;
+}
+.svgai-page .svgai-faq-item summary {
+  font-size: 14px;
+  line-height: 1.6;
+}
+.svgai-page .svgai-faq-item p {
+  font-size: 14px;
+  line-height: 1.85;
+}
+.svgai-page .svgai-footer {
+  background: var(--svg-paper);
+}
+.svgai-page .svgai-footer-links h3 {
+  font-size: 13px;
+}
+.svgai-page .svgai-footer-bottom {
+  font-size: 11px;
+}
+.svg-story-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 85px;
+  padding-block: 38px 74px;
+}
+.svg-story-heading h2 {
+  font-size: 37px;
+  line-height: 1.18;
+  margin: 14px 0 24px;
+  max-width: 510px;
+}
+.svg-story-kicker {
+  font-size: 11px;
+  color: var(--svg-accent);
+  font-weight: 600;
+}
+.svg-story-prose p,
+.svg-use-list p,
+.svg-craft p,
+.svg-tool-explainer p,
+.svg-guide-layout p {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--muted-foreground);
+}
+.svg-story-prose p + p {
+  margin-top: 20px;
+}
+.svg-story-links {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+}
+.svg-story-links a,
+.svg-tool-explainer a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 550;
+  color: var(--svg-accent);
+  text-underline-offset: 5px;
+}
+.svg-story-links a:hover,
+.svg-tool-explainer a:hover {
+  text-decoration: underline;
+}
+.svg-uses {
+  border-top: 1px solid var(--border);
+  padding-block: 64px 72px;
+}
+.svg-uses > h2 {
+  font-size: 38px;
+  line-height: 1.17;
+  max-width: 650px;
+  margin-bottom: 38px;
+}
+.svg-use-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 70px;
+  padding-block: 25px;
+  border-top: 1px solid var(--border);
+}
+.svg-use-title {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+.svg-use-title svg {
+  flex-shrink: 0;
+  color: var(--svg-accent);
+  margin-top: 3px;
+}
+.svg-use-title h3 {
+  font-size: 21px;
+  line-height: 1.4;
+  max-width: 330px;
+}
+.svg-craft {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 24px;
+  padding-bottom: 78px;
+}
+.svg-vector-detail,
+.svg-prompt-guide {
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  overflow: clip;
+  background: var(--card);
+}
+.svg-vector-comparison {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  background: var(--svg-paper);
+  padding: 24px;
+  border-bottom: 1px solid var(--border);
+}
+.svg-vector-comparison img {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+}
+.svg-vector-comparison img + img {
+  border-left: 1px solid var(--border);
+}
+.svg-vector-detail > div:last-child,
+.svg-prompt-guide > div {
+  padding: 30px;
+}
+.svg-craft h2 {
+  font-size: 28px;
+  line-height: 1.2;
+  margin: 0 0 17px;
+}
+.svg-prompt-guide {
+  display: flex;
+  flex-direction: column;
+}
+.svg-prompt-guide svg {
+  margin-bottom: 28px;
+  color: var(--svg-accent);
+}
+.svg-prompt-guide blockquote {
+  margin: 0 30px 30px;
+  padding: 22px;
+  border-left: 2px solid var(--svg-accent);
+  background: var(--svg-tint);
+  font-family: var(--font-display);
+  font-size: 20px;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+}
+.svg-closing {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 35px;
+  padding: 42px 0 66px;
+}
+.svg-closing h2 {
+  font-size: 36px;
+  line-height: 1.18;
+  max-width: 720px;
+}
+.svg-closing p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+  max-width: 650px;
+  margin-top: 14px;
+}
+.svg-brand-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  white-space: nowrap;
+  padding: 15px 21px;
+  border-radius: 5px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 13px;
+  flex-shrink: 0;
+}
+.svg-brand-button:hover {
+  filter: brightness(0.95);
+}
+.svg-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding-top: 27px;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.svg-breadcrumb a:hover {
+  color: var(--svg-accent);
+}
+.svg-breadcrumb span {
+  color: var(--foreground);
+}
+.svgai-page.svg-inner-page .svg-hero {
+  padding-top: 28px;
+}
+.svg-inner-intro {
+  padding-block: 48px 35px;
+}
+.svg-inner-intro h1 {
+  max-width: 1050px;
+  font-size: clamp(42px, 5.2vw, 72px);
+  line-height: 1.07;
+  letter-spacing: -0.065em;
+}
+.svg-inner-intro h1 span {
+  color: var(--svg-accent);
+}
+.svg-inner-intro > p {
+  margin-top: 22px;
+  font-size: 16px;
+  line-height: 1.7;
+  max-width: 700px;
+  color: var(--muted-foreground);
+}
+.svg-inner-page .svgai-showcase {
+  border-top: 0;
+  padding-top: 35px;
+}
+.svg-tool-explainer {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 90px;
+  border-top: 1px solid var(--border);
+  padding-block: 58px;
+}
+.svg-tool-explainer h2 {
+  font-size: 35px;
+  line-height: 1.18;
+}
+.svg-tool-explainer a {
+  margin-top: 25px;
+}
+.svg-tool-explainer .svg-availability-note {
+  margin-top: 18px;
+  padding-left: 14px;
+  border-left: 2px solid var(--svg-accent);
+  font-size: 12px;
+}
+.svg-example-note {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.85;
+  margin-top: -42px;
+  margin-bottom: 58px;
+}
+.svg-guide-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.65fr) minmax(0, 1.35fr);
+  gap: 95px;
+  padding-block: 32px 55px;
+}
+.svg-guide-layout > nav {
+  position: sticky;
+  top: 108px;
+  align-self: start;
+  display: grid;
+  gap: 4px;
+  border-left: 1px solid var(--border);
+}
+.svg-guide-layout > nav a {
+  padding: 13px 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.svg-guide-layout > nav a:hover {
+  color: var(--svg-accent);
+  background: var(--svg-tint);
+}
+.svg-guide-layout section {
+  padding-bottom: 40px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 110px;
+}
+.svg-guide-layout h2 {
+  font-size: 29px;
+  line-height: 1.2;
+  margin-bottom: 20px;
+}
+.svg-auth-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 100svh;
+  padding: 24px;
+  gap: 60px;
+  align-items: center;
+}
+.svg-auth-brand {
+  min-height: calc(100svh - 48px);
+  background: var(--svg-tint);
+  padding: 45px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 30px;
+}
+.svg-auth-brand > div {
+  margin-top: 32px;
+}
+.svg-auth-brand h2 {
+  font-size: clamp(38px, 4vw, 64px);
+  line-height: 1.03;
+  white-space: pre-line;
+  letter-spacing: -0.065em;
+}
+.svg-auth-brand p {
+  margin-top: 22px;
+  font-size: 15px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+  max-width: 440px;
+}
+.svg-auth-art {
+  width: min(65%, 350px);
+  height: auto;
+  align-self: center;
+}
+.svg-auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.svg-auth-form {
+  margin: 45px auto;
+}
+.svg-auth-form-brand {
+  font-family: var(--font-display);
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.05em;
+}
+.svg-auth-form [data-slot='card'] {
+  border: 0;
+  box-shadow: none;
+  background: transparent;
+}
+.svg-auth-form [data-slot='card-title'] {
+  font-family: var(--font-display);
+  font-size: 31px;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+}
+.svg-legal-page article {
+  padding-block: 25px 35px;
+}
+.svg-legal-page article h1 {
+  font-size: 52px;
+  letter-spacing: -0.055em;
+}
+.svg-legal-page article h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1.3;
+  margin-top: 32px;
+}
+@media (max-width: 1100px) {
+  .svgai-page .svgai-desktop-nav {
+    margin-left: 0;
+  }
+  .svgai-page .svgai-desktop-nav a {
+    padding-inline: 11px;
+  }
+  .svg-story-intro,
+  .svg-tool-explainer,
+  .svg-guide-layout {
+    gap: 45px;
+  }
+  .svgai-page .svgai-benefit-copy h3 {
+    font-size: 29px;
+  }
+  .svg-auth-shell {
+    gap: 25px;
+  }
+  .svg-auth-brand {
+    padding: 30px;
+  }
+}
+@media (max-width: 900px) {
+  .svgai-page .svg-hero h1 {
+    font-size: 52px;
+    max-width: 900px;
+  }
+  .svg-story-intro {
+    gap: 35px;
+  }
+  .svg-story-heading h2 {
+    font-size: 30px;
+  }
+  .svg-use-list article {
+    gap: 35px;
+  }
+  .svg-craft {
+    gap: 17px;
+  }
+  .svg-vector-detail > div:last-child,
+  .svg-prompt-guide > div {
+    padding: 23px;
+  }
+  .svg-prompt-guide blockquote {
+    margin: 0 23px 23px;
+    font-size: 18px;
+  }
+  .svg-craft h2 {
+    font-size: 25px;
+  }
+  .svg-closing {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 760px) {
+  .svgai-page .svgai-container {
+    width: calc(100% - 40px);
+  }
+  .svgai-page .svgai-header-inner {
+    height: 66px;
+  }
+  .svgai-page .svgai-desktop-nav {
+    display: none;
+  }
+  .svgai-page .svgai-menu-toggle {
+    display: inline-flex;
+  }
+  .svgai-page .svgai-brand {
+    font-size: 25px;
+  }
+  .svgai-page .svgai-brand img {
+    width: 31px;
+    height: 31px;
+  }
+  .svgai-page .svgai-header-actions {
+    gap: 7px;
+  }
+  .svgai-page .svg-hero {
+    padding-top: 32px;
+    padding-bottom: 44px;
+  }
+  .svgai-page .svg-hero h1 {
+    font-size: 40px;
+    line-height: 1.08;
+    letter-spacing: -0.06em;
+  }
+  .svgai-page .svg-hero h1 em {
+    display: block;
+  }
+  .svgai-page .svg-hero-intro > p {
+    font-size: 13px;
+    line-height: 1.75;
+    max-width: 460px;
+  }
+  .svgai-page .svg-input-body {
+    padding: 22px 18px 18px;
+  }
+  .svgai-page .svg-hero-kicker {
+    font-size: 9px;
+  }
+  .svg-story-intro,
+  .svg-tool-explainer,
+  .svg-guide-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding-block: 35px 45px;
+  }
+  .svg-story-heading h2 {
+    font-size: 31px;
+    max-width: 500px;
+  }
+  .svg-story-prose p,
+  .svg-use-list p,
+  .svg-craft p {
+    font-size: 14px;
+    line-height: 1.85;
+  }
+  .svgai-page .svgai-section-intro h2 {
+    font-size: 30px;
+  }
+  .svgai-page .svgai-showcase {
+    padding-block: 43px 49px;
+  }
+  .svgai-page .svgai-section-intro > p {
+    font-size: 13px;
+  }
+  .svgai-page .svgai-sample-caption {
+    padding: 13px;
+  }
+  .svgai-page .svgai-sample-caption strong {
+    font-size: 12px;
+  }
+  .svgai-page .svgai-sample-caption > span > span {
+    font-size: 10px;
+  }
+  .svgai-page .svgai-workflow-section {
+    padding-block: 44px 50px;
+  }
+  .svgai-page .svgai-workflow h3 {
+    font-size: 17px;
+  }
+  .svgai-page .svgai-benefit-copy h3 {
+    font-size: 28px;
+  }
+  .svg-uses {
+    padding-block: 43px 45px;
+  }
+  .svg-uses > h2 {
+    font-size: 31px;
+  }
+  .svg-use-list article {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding-block: 25px;
+  }
+  .svg-use-title {
+    gap: 13px;
+  }
+  .svg-use-title h3 {
+    font-size: 21px;
+  }
+  .svg-craft {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 19px;
+    padding-bottom: 44px;
+  }
+  .svg-vector-comparison img {
+    height: 160px;
+  }
+  .svgai-page .svgai-faq {
+    padding-block: 44px 50px;
+  }
+  .svg-closing {
+    padding-block: 27px 46px;
+    gap: 24px;
+  }
+  .svg-closing h2 {
+    font-size: 31px;
+  }
+  .svg-brand-button {
+    font-size: 12px;
+  }
+  .svg-inner-intro {
+    padding-top: 31px;
+  }
+  .svg-inner-intro h1 {
+    font-size: 42px;
+  }
+  .svg-inner-intro > p {
+    font-size: 14px;
+  }
+  .svg-tool-explainer h2 {
+    font-size: 30px;
+  }
+  .svg-guide-layout > nav {
+    position: static;
+  }
+  .svg-guide-layout section {
+    padding-bottom: 27px;
+    margin-bottom: 25px;
+  }
+  .svg-guide-layout h2 {
+    font-size: 26px;
+  }
+  .svg-example-note {
+    margin-top: -20px;
+    margin-bottom: 30px;
+  }
+  .svg-auth-shell {
+    grid-template-columns: minmax(0, 1fr);
+    padding: 15px;
+    gap: 15px;
+  }
+  .svg-auth-brand {
+    min-height: 0;
+    padding: 25px;
+    gap: 20px;
+  }
+  .svg-auth-brand > div {
+    margin-top: 8px;
+  }
+  .svg-auth-brand h2 {
+    font-size: 36px;
+  }
+  .svg-auth-brand p {
+    font-size: 13px;
+  }
+  .svg-auth-art {
+    display: none;
+  }
+  .svg-auth-back {
+    margin-top: 5px;
+  }
+  .svg-auth-form {
+    margin: 12px auto 30px;
+  }
+  .svg-legal-page article h1 {
+    font-size: 38px;
+  }
+}
+@media (max-width: 374px) {
+  .svgai-page .svg-hero h1 {
+    font-size: 35px;
+  }
+  .svgai-page .svgai-header-actions {
+    gap: 2px;
+  }
+  .svgai-page .svgai-sign-in {
+    padding-inline: 11px;
+    gap: 7px;
+  }
+  .svgai-page .svgai-theme-button {
+    width: 30px;
+  }
+  .svg-inner-intro h1 {
+    font-size: 36px;
+  }
+}
+
+/* Auth routes load their own CSS chunk, so keep the lockup self-contained. */
+.svg-auth-brand .svgai-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  align-self: flex-start;
+}
+.svg-auth-form-brand {
+  align-self: center;
+}

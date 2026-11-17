@@ -19,6 +19,7 @@ import { useUserPermissions } from '@/hooks/use-user-permissions';
 import { AppLayout } from '@/components/app-layout';
 
 export const Route = createFileRoute('/admin')({
+  head: () => ({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] }),
   component: AdminLayout,
 });
 

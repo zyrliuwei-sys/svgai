@@ -97,5 +97,6 @@ function AuthCallbackPage() {
 }
 
 export const Route = createFileRoute('/(auth)/auth-callback')({
+  head: () => ({ meta: [{ title: m['common.sign.sign_in_title']() }] }),
   component: AuthCallbackPage,
 });

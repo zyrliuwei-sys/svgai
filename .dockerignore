@@ -8,13 +8,11 @@ build
 src/routeTree.gen.ts
 src/paraglide
 
-# env files — .env.production is created by CI and needed at build time
-# so Vite can inline VITE_* into the client bundle.
+# Runtime secrets never enter the Docker build context. Public VITE_* values
+# are passed as explicit build arguments instead.
 .env
-.env.local
-.env.development
+.env.*
 !.env.example
-!.env.production
 
 # local database
 data
@@ -43,4 +41,11 @@ LICENSE
 .DS_Store
 *.log
 *.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
+*.sql
 *.tsbuildinfo

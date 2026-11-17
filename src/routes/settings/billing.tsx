@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 
 import { tDynamic } from '@/core/i18n/dynamic';
 import { Link } from '@/core/i18n/navigation';
+import { envConfigs } from '@/config';
 import { ApiError, apiGet, apiPost, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
@@ -481,6 +482,11 @@ function DetailRow({
 }
 
 export const Route = createFileRoute('/settings/billing')({
+  head: () => ({
+    meta: [
+      { title: m['settings.billing.title']() + ' | ' + envConfigs.app_name },
+    ],
+  }),
   component: () => (
     <FeatureGate feature="billing">
       <BillingPage />

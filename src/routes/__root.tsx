@@ -10,6 +10,8 @@ import {
   type ErrorComponentProps,
 } from '@tanstack/react-router';
 import { createServerFn } from '@tanstack/react-start';
+import displayFont from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url';
+import geistFont from '@fontsource-variable/geist/files/geist-latin-wght-normal.woff2?url';
 import { ThemeProvider } from 'next-themes';
 
 import { envConfigs } from '@/config';
@@ -28,7 +30,7 @@ import {
 } from '@/config/appearance';
 import { parseCookieConsent } from '@/lib/cookie-consent';
 import { getQueryClient } from '@/lib/query-client';
-import { getLocale, locales, localizeUrl } from '@/paraglide/runtime.js';
+import { getLocale } from '@/paraglide/runtime.js';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useCookieConsent } from '@/hooks/use-cookie-consent';
 import { CookieConsent } from '@/blocks/cookie-consent';
@@ -41,13 +43,10 @@ import { GoogleOneTap } from '@/components/google-one-tap';
 import { SandboxPreviewBridge } from '@/components/sandbox-preview-bridge';
 import { Toaster } from '@/components/ui/sonner';
 
-import '@fontsource-variable/inter';
-import '@fontsource-variable/nunito';
-import '@fontsource-variable/source-serif-4';
-import '@fontsource/libre-baskerville/400.css';
-import '@fontsource/libre-baskerville/700.css';
-import '@fontsource/libre-baskerville/400-italic.css';
+import '@/styles/fonts.css';
 import '@/styles/globals.css';
+import '@/styles/svg-brand.css';
+import '@/styles/svg-quality.css';
 
 // Analytics IDs live in the DB config (1h-cached service). Fetched via a
 // server function so drizzle/db code never reaches the client bundle.
@@ -126,16 +125,7 @@ const getAnalyticsConfigs = createServerFn().handler(async () => {
 
 export const Route = createRootRoute({
   loader: () => getAnalyticsConfigs(),
-  head: () => {
-    // head() runs on the SSR server AND again on the client during hydration.
-    // On the client, app_url falls back to the localhost dev default when
-    // VITE_APP_URL wasn't inlined into the client bundle at build — which would
-    // emit a second, localhost set of hreflang links. Prefer the live origin
-    // on the client so it always matches; the server uses the configured URL.
-    const appUrl =
-      (typeof window !== 'undefined' && window.location?.origin) ||
-      envConfigs.app_url ||
-      '';
+  head: ({ loaderData }) => {
     return {
       meta: [
         { charSet: 'utf-8' },
@@ -144,13 +134,38 @@ export const Route = createRootRoute({
         { name: 'description', content: envConfigs.app_description },
       ],
       links: [
-        { rel: 'icon', href: '/favicon.svg', type: 'image/svg+xml' },
-        { rel: 'apple-touch-icon', href: '/favicon.svg' },
-        ...locales.map((loc) => ({
-          rel: 'alternate',
-          hrefLang: loc,
-          href: localizeUrl(`${appUrl}/`, { locale: loc }).href,
-        })),
+        {
+          rel: 'icon',
+          href: '/favicon.ico',
+          type: 'image/x-icon',
+          sizes: '16x16 32x32 48x48',
+        },
+        {
+          rel: 'icon',
+          href: '/favicon-96x96.png',
+          type: 'image/png',
+          sizes: '96x96',
+        },
+        {
+          rel: 'icon',
+          href: '/favicon.svg',
+          type: 'image/svg+xml',
+          sizes: 'any',
+        },
+        {
+          rel: 'apple-touch-icon',
+          href: '/apple-touch-icon.png',
+          sizes: '180x180',
+        },
+        ...(!loaderData?.appearanceEnabled
+          ? [geistFont, displayFont].map((href) => ({
+              rel: 'preload',
+              as: 'font',
+              href,
+              type: 'font/woff2',
+              crossOrigin: 'anonymous' as const,
+            }))
+          : []),
       ],
     };
   },
@@ -213,7 +228,12 @@ function RootComponent() {
           <CookieConsent initial={analytics?.cookieConsent ?? null} />
         ) : null}
       </ThemeProvider>
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      {import.meta.env.DEV && (
+        <ReactQueryDevtools
+          initialIsOpen={false}
+          buttonPosition="bottom-left"
+        />
+      )}
     </QueryClientProvider>
   );
 }

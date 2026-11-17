@@ -13,7 +13,6 @@ import {
 import { useTheme } from 'next-themes';
 
 import { signOut } from '@/core/auth/client';
-import { tDynamic } from '@/core/i18n/dynamic';
 import { useRouter } from '@/core/i18n/navigation';
 import { THEMES } from '@/config/appearance';
 import { localeNames } from '@/config/locale';
@@ -24,7 +23,7 @@ import {
   localizeHref,
   setLocale,
 } from '@/paraglide/runtime.js';
-import { useAppearance } from '@/hooks/use-appearance';
+import { appearanceOptions, useAppearance } from '@/hooks/use-appearance';
 import { ThemeDot } from '@/components/appearance-options';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -216,15 +215,18 @@ export function UserMenu({
                     {!userTheme && <CheckIcon className="size-3.5" />}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  {THEMES.map((t) => (
+                  {appearanceOptions('theme').map((t) => (
                     <DropdownMenuItem
                       key={t.id}
-                      onClick={() => setUserTheme(t.id)}
+                      onClick={() =>
+                        setUserTheme(t.id as (typeof THEMES)[number]['id'])
+                      }
                     >
-                      <ThemeDot color={t.swatch} className="size-3.5" />
-                      <span className="flex-1">
-                        {tDynamic(`common.themes.${t.id}`)}
-                      </span>
+                      <ThemeDot
+                        color={t.swatch ?? siteSwatch}
+                        className="size-3.5"
+                      />
+                      <span className="flex-1">{t.label}</span>
                       {userTheme === t.id && <CheckIcon className="size-3.5" />}
                     </DropdownMenuItem>
                   ))}

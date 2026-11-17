@@ -40,6 +40,14 @@ wrangler.jsonc
 # misc
 .DS_Store
 *.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
+*.db-*
+*.sqlite-*
 
 # debug
 .indexnow-backup-*/

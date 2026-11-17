@@ -52,11 +52,12 @@ export interface GuestPostRow {
 }
 
 /** Public rules + packages; shared cache across pages. */
-export function useGuestPostInfo() {
+export function useGuestPostInfo(initialData?: GuestPostInfo) {
   return useQuery({
     queryKey: ['guest-post-info'],
     queryFn: () => apiGet<GuestPostInfo>('/api/guest-posts/info'),
     staleTime: 60_000,
+    initialData,
   });
 }
 

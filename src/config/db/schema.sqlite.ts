@@ -844,3 +844,32 @@ export const operationsExperiment = table(
 
 export type AnalyticsVisitor = typeof analyticsVisitor.$inferSelect;
 export type OperationsExperiment = typeof operationsExperiment.$inferSelect;
+
+// Anonymous previews contain private vector sources; only raster previews leave
+// the server before a verified purchase. Nullable user IDs are bound on sign-in.
+export const svgPreview = table('svg_preview', {
+  id: text('id').primaryKey(),
+  visitorHash: text('visitor_hash').notNull().unique(),
+  userId: text('user_id')
+    .unique()
+    .references(() => user.id, { onDelete: 'cascade' }),
+  inputHash: text('input_hash').notNull(),
+  mode: text('mode').notNull(),
+  status: text('status').notNull(),
+  attempt: integer('attempt').notNull().default(1),
+  options: text('options').notNull(),
+  providerTaskId: text('provider_task_id'),
+  svg: text('svg'),
+  previewPng: text('preview_png'),
+  stats: text('stats'),
+  costCredits: integer('cost_credits').notNull().default(0),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
+// Persistent, atomic daily quotas survive Worker restarts. IDs are keyed hashes,
+// never raw IP addresses. The same counter table also bounds global free usage.
+export const svgPreviewQuota = table('svg_preview_quota', {
+  id: text('id').primaryKey(),
+  count: integer('count').notNull().default(0),
+});

@@ -11,6 +11,8 @@ import { resolveAfterAuthUrl, safeInternalPath } from '@/lib/redirect';
 import { m } from '@/paraglide/messages.js';
 import { localizeHref } from '@/paraglide/runtime.js';
 import { usePublicConfig } from '@/hooks/use-public-config';
+import { AuthBrand } from '@/blocks/auth-brand';
+import { AuthHelp } from '@/blocks/auth-help';
 import { TextField } from '@/components/form-field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,10 +25,10 @@ import {
 
 const signUpSchema = z
   .object({
-    name: z.string().min(1),
-    email: z.string().email(m['common.sign.email_placeholder']()),
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
+    name: z.string().trim().min(1, m['common.sign.name_required']()),
+    email: z.string().email(m['common.sign.email_invalid']()),
+    password: z.string().min(8, m['common.sign.password_min_length']()),
+    confirmPassword: z.string().min(8, m['common.sign.password_min_length']()),
     inviteCode: z.string(),
   })
   .refine((d) => d.password === d.confirmPassword, {
@@ -43,22 +45,37 @@ function SignUpPage() {
 
   const [redirectParam, setRedirectParam] = useState<string | null>(null);
   const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
+  const [paramsReady, setParamsReady] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setRedirectParam(params.get('redirect'));
     setCallbackUrl(params.get('callbackUrl'));
+    setParamsReady(true);
   }, []);
 
   // Already signed in (visited /sign-up directly, or a stale callbackUrl looped
   // back here) → go home. The auth pages never gate themselves, so this can't loop.
   useEffect(() => {
-    if (sessionPending || navigatingRef.current) return;
+    if (sessionPending || !paramsReady || navigatingRef.current) return;
     if (session?.user) {
       navigatingRef.current = true;
-      router.push('/');
+      router.replace(
+        resolveAfterAuthUrl({
+          redirect: redirectParam,
+          callbackUrl,
+          fallback: '/settings',
+        })
+      );
     }
-  }, [sessionPending, session?.user, router]);
+  }, [
+    sessionPending,
+    session?.user,
+    router,
+    paramsReady,
+    redirectParam,
+    callbackUrl,
+  ]);
 
   // Allow only same-site relative paths, and never an auth page (would loop).
   const safeCallbackUrl = safeInternalPath(callbackUrl);
@@ -167,15 +184,16 @@ function SignUpPage() {
   }
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="self-center font-serif text-lg italic">
+    <div className="svgai-page svg-auth-shell">
+      <AuthBrand />
+      <div className="svg-auth-form flex w-full max-w-sm flex-col gap-6">
+        <Link href="/" className="svg-auth-form-brand">
           {configs.app_name || envConfigs.app_name}
         </Link>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">
-              {m['common.sign.sign_up_title']()}
+              <h1>{m['common.sign.sign_up_title']()}</h1>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -270,6 +288,7 @@ function SignUpPage() {
                             field={field}
                             label={m['common.sign.email_title']()}
                             type="email"
+                            autoComplete="email"
                             required
                             placeholder={m['common.sign.email_placeholder']()}
                           />
@@ -281,6 +300,7 @@ function SignUpPage() {
                             field={field}
                             label={m['common.sign.password_title']()}
                             type="password"
+                            autoComplete="new-password"
                             required
                             placeholder={m[
                               'common.sign.password_placeholder'
@@ -294,6 +314,7 @@ function SignUpPage() {
                             field={field}
                             label={m['common.sign.confirm_password_title']()}
                             type="password"
+                            autoComplete="new-password"
                             required
                             placeholder={m[
                               'common.sign.confirm_password_placeholder'
@@ -321,7 +342,7 @@ function SignUpPage() {
                           {(isSubmitting) => (
                             <Button type="submit" disabled={isSubmitting}>
                               {isSubmitting
-                                ? '...'
+                                ? m['common.sign.creating_account']()
                                 : m['common.sign.sign_up_title']()}
                             </Button>
                           )}
@@ -343,11 +364,18 @@ function SignUpPage() {
             )}
           </CardContent>
         </Card>
+        <AuthHelp />
       </div>
     </div>
   );
 }
 
 export const Route = createFileRoute('/(auth)/sign-up')({
+  head: () => ({
+    meta: [
+      { title: m['common.sign.sign_up_title']() + ' | ' + envConfigs.app_name },
+      { name: 'robots', content: 'noindex, follow' },
+    ],
+  }),
   component: SignUpPage,
 });

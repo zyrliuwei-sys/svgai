@@ -1,0 +1,842 @@
+/* Craft pass: readable controls, a tactile vector study, and editorial pacing. */
+.svg-preview-lock {
+  position: absolute;
+  bottom: 19px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 10px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--card);
+  color: var(--muted-foreground);
+  font-size: 10px;
+  white-space: nowrap;
+}
+.svg-paywall {
+  max-width: min(480px, calc(100vw - 32px));
+  padding: 35px;
+  gap: 0;
+  background: var(--card);
+  border-radius: 12px;
+  font-family: var(--font-sans);
+}
+.svg-paywall-symbol {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 23px;
+  background: var(--svg-tint);
+  color: var(--primary);
+  border: 1px solid var(--border);
+  border-radius: 11px;
+}
+.svg-paywall-close {
+  position: absolute;
+  right: 17px;
+  top: 17px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  color: var(--muted-foreground);
+  border-radius: 4px;
+}
+.svg-paywall-close:hover {
+  background: var(--secondary);
+}
+.svg-paywall h2 {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  margin-bottom: 13px;
+}
+.svg-paywall [data-slot='dialog-description'] {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+}
+.svg-paywall ul {
+  display: grid;
+  gap: 13px;
+  margin: 23px 0;
+  font-size: 12px;
+}
+.svg-paywall li {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+.svg-paywall li svg {
+  color: var(--primary);
+  flex-shrink: 0;
+}
+.svg-paywall-credit-note {
+  font-size: 11px;
+  line-height: 1.7;
+  padding: 13px;
+  background: var(--secondary);
+  color: var(--muted-foreground);
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+.svg-paywall-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 46px;
+  border-radius: 5px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 13px;
+  cursor: pointer;
+}
+.svg-paywall-back {
+  width: 100%;
+  min-height: 40px;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  cursor: pointer;
+}
+.svg-paywall :is(button, a):focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+.svgai-page .svg-hero-intro {
+  position: relative;
+}
+.svgai-page .svg-hero h1 {
+  max-width: 1160px;
+  font-size: clamp(43px, 5.05vw, 73px);
+  letter-spacing: -0.068em;
+  line-height: 1.09;
+}
+.svgai-page .svg-hero h1 em {
+  font-weight: 460;
+}
+.svgai-page .svg-hero-intro > p {
+  max-width: 900px;
+  font-size: 15px;
+  line-height: 1.75;
+}
+.svgai-page .svg-hero-kicker {
+  letter-spacing: 0.13em;
+}
+.svgai-page .svgai-desktop-nav a {
+  position: relative;
+  font-size: 13px;
+}
+.svgai-page .svgai-icon-button {
+  min-width: 40px;
+  min-height: 40px;
+}
+.svgai-page .svgai-desktop-nav a[aria-current='page'] {
+  color: var(--foreground);
+}
+.svgai-page .svgai-desktop-nav a[aria-current='page']::after {
+  content: '';
+  position: absolute;
+  height: 2px;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  background: var(--svg-accent);
+}
+.svgai-account-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: var(--muted-foreground);
+}
+.svg-skip-link {
+  position: fixed;
+  left: 20px;
+  top: 12px;
+  transform: translateY(-160%);
+  z-index: 100;
+  padding: 12px 16px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border-radius: 5px;
+  font-size: 13px;
+}
+.svg-skip-link:focus {
+  transform: none;
+}
+.svgai-page #main-content:focus {
+  outline: none;
+}
+.svgai-page .svg-input-tabs > button {
+  font-size: 13px;
+}
+.svgai-page .svg-prompt-box textarea {
+  font-size: 14px;
+  line-height: 1.8;
+  min-height: 133px;
+}
+.svgai-page .svg-prompt-suggestions {
+  font-size: 11px;
+  gap: 6px;
+}
+.svgai-page .svg-prompt-suggestions button {
+  font-size: 11px;
+  min-height: 28px;
+  padding: 4px 8px;
+}
+.svgai-page .svg-style-options button {
+  font-size: 11px;
+  min-height: 68px;
+}
+.svgai-page .svg-option-row {
+  font-size: 12px;
+}
+.svgai-page .svg-option-row select {
+  font-size: 11px;
+  min-height: 33px;
+}
+.svgai-page .svg-input-note {
+  font-size: 10px;
+  line-height: 1.6;
+}
+.svgai-page .svg-output-tabs button {
+  font-size: 11px;
+  min-height: 32px;
+}
+.svg-output-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.svgai-page .svg-output-label {
+  font-size: 10px;
+}
+.svg-expand-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+  border-radius: 4px;
+}
+.svg-expand-button:hover:not(:disabled) {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+.svgai-page .svg-zoom-controls button {
+  min-width: 30px;
+  min-height: 30px;
+  font-size: 10px;
+}
+.svgai-page .svg-palette {
+  max-width: 270px;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.svgai-page .svg-color-swatch {
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  border-radius: 50%;
+}
+.svgai-page .svg-color-swatch input {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.svg-color-swatch:focus-within {
+  outline: 2px solid var(--svg-accent);
+  outline-offset: 3px;
+}
+.svgai-page .svg-vector-stats {
+  font-size: 10px;
+}
+.svgai-page .svg-copy-button {
+  font-size: 11px;
+  min-height: 36px;
+  padding: 8px 4px;
+}
+.svgai-page .svg-download-button {
+  font-size: 11px;
+  min-height: 36px;
+  padding-inline: 12px;
+}
+.dark .svg-artwork.is-outline,
+.dark .svg-expanded-artboard .is-outline {
+  filter: brightness(1.7) saturate(0.8);
+}
+.svg-expanded-view {
+  width: min(1100px, calc(100vw - 40px));
+  max-width: calc(100vw - 40px);
+  height: min(850px, calc(100dvh - 40px));
+  padding: 0;
+  gap: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: clip;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  font-family: var(--font-sans);
+}
+.svg-expanded-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px 28px;
+  border-bottom: 1px solid var(--border);
+}
+.svg-expanded-header h2 {
+  font-family: var(--font-display);
+  font-size: 25px;
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+.svg-expanded-header p {
+  color: var(--muted-foreground);
+  font-size: 12px;
+  margin-top: 7px;
+  line-height: 1.6;
+}
+.svg-expanded-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  min-height: 40px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  cursor: pointer;
+}
+.svg-expanded-close:hover {
+  background: var(--secondary);
+}
+.svg-expanded-artboard {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--svg-paper);
+  background-image:
+    linear-gradient(var(--svg-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--svg-grid) 1px, transparent 1px);
+  background-size: 30px 30px;
+  padding: 24px;
+}
+.svg-expanded-artboard img {
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+}
+.svg-expanded-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 28px;
+  border-top: 1px solid var(--border);
+}
+.svg-expanded-footer > span {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.svg-expanded-footer > button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 5px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 12px;
+  cursor: pointer;
+}
+.svg-expanded-view :is(button, a):focus-visible {
+  outline: 2px solid var(--svg-accent);
+  outline-offset: 3px;
+}
+.svgai-page .svgai-sample-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 25px;
+  margin-top: 35px;
+}
+.svgai-page .svgai-sample {
+  border: 0;
+  border-radius: 0;
+  overflow: visible;
+}
+.svgai-page .svgai-sample-botanical {
+  grid-column: span 7;
+}
+.svgai-page .svgai-sample-orbit {
+  grid-column: span 5;
+}
+.svgai-page .svgai-sample-landscape {
+  grid-column: span 5;
+}
+.svgai-page .svgai-sample-butterfly {
+  grid-column: span 7;
+}
+.svgai-page .svgai-sample-art {
+  height: 300px;
+  aspect-ratio: auto;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  position: relative;
+  padding: 25px;
+}
+.svgai-page .svgai-sample-orbit .svgai-sample-art {
+  background: var(--svg-lemon);
+}
+.svgai-page .svgai-sample-landscape .svgai-sample-art,
+.svgai-page .svgai-sample-butterfly .svgai-sample-art {
+  height: 250px;
+}
+.svgai-page .svgai-sample-art img {
+  position: absolute;
+  width: calc(100% - 50px);
+  height: calc(100% - 50px);
+  inset: 25px;
+  transition:
+    transform 400ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 250ms ease;
+}
+.svgai-page .svgai-sample-art .svg-sample-outline {
+  opacity: 0;
+}
+.svgai-page .svgai-sample-caption {
+  border: 0;
+  background: transparent;
+  padding: 17px 1px 5px;
+}
+.svgai-page .svgai-sample-caption strong {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+.svgai-page .svgai-sample-caption > span {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.svgai-page .svgai-sample-caption > span > span {
+  font-size: 11px;
+}
+.svgai-page .svgai-sample:focus-visible .svg-sample-fill {
+  opacity: 0;
+}
+.svgai-page .svgai-sample:focus-visible .svg-sample-outline {
+  opacity: 1;
+}
+@media (hover: hover) {
+  .svgai-page .svgai-sample:hover .svg-sample-fill {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  .svgai-page .svgai-sample:hover .svg-sample-outline {
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+  .svgai-page .svgai-sample:hover .svgai-sample-caption > svg {
+    transform: translate(3px, -3px);
+  }
+}
+.dark .svg-sample-outline {
+  filter: brightness(1.6) saturate(0.8);
+}
+.dark .svgai-sample-orbit .svg-sample-outline {
+  filter: none;
+}
+.dark .svgai-sample-orbit .svgai-sample-art {
+  background: oklch(0.9 0.08 110);
+}
+.svgai-page .svg-story-intro {
+  padding-bottom: 60px;
+}
+.svgai-page .svgai-showcase {
+  padding-bottom: 60px;
+}
+.svgai-page .svgai-workflow-section {
+  padding-bottom: 60px;
+}
+.svgai-page .svg-uses {
+  padding-top: 55px;
+}
+.svgai-page .svg-vector-detail {
+  background: var(--card);
+}
+.svg-curve-study {
+  background: var(--svg-paper);
+  border-bottom: 1px solid var(--border);
+}
+.svg-curve-caption {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 19px 0;
+  font-size: 11px;
+  font-weight: 500;
+}
+.svg-curve-caption > div {
+  display: flex;
+  gap: 6px;
+}
+.svg-curve-caption button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  color: var(--muted-foreground);
+}
+.svg-curve-caption button:hover {
+  background: var(--card);
+  color: var(--foreground);
+}
+.svg-curve-canvas {
+  width: 100%;
+  height: auto;
+  display: block;
+  max-height: 300px;
+  overflow: visible;
+}
+.svg-curve-ghost {
+  stroke: var(--border);
+  stroke-width: 14;
+  stroke-linecap: round;
+  stroke-dasharray: 2 12;
+}
+.svg-curve-tangents {
+  stroke: var(--muted-foreground);
+  stroke-width: 1;
+  stroke-dasharray: 3 4;
+  opacity: 0.7;
+}
+.svg-curve-path {
+  stroke: var(--svg-accent);
+  stroke-width: 14;
+  stroke-linecap: round;
+}
+.svg-curve-anchor {
+  fill: var(--svg-lemon);
+  stroke: var(--svg-accent);
+  stroke-width: 2;
+}
+.svg-curve-handle {
+  cursor: grab;
+  touch-action: none;
+  outline: none;
+}
+.svg-curve-handle:active {
+  cursor: grabbing;
+}
+.svg-curve-hit {
+  fill: transparent;
+}
+.svg-curve-point {
+  fill: var(--card);
+  stroke: var(--svg-accent);
+  stroke-width: 2;
+  pointer-events: none;
+  transition: stroke-width 150ms ease;
+}
+.svg-curve-handle:hover .svg-curve-point,
+.svg-curve-handle:focus-visible .svg-curve-point {
+  stroke-width: 5;
+}
+.svg-curve-handle:focus-visible .svg-curve-hit {
+  stroke: var(--svg-accent);
+  stroke-width: 1;
+  stroke-dasharray: 2 3;
+}
+.svg-curve-study.is-dragging .svg-curve-point {
+  fill: var(--svg-lemon);
+}
+.svg-curve-hint {
+  margin: 0;
+  padding: 0 19px 17px;
+  font-size: 11px !important;
+  color: var(--muted-foreground);
+  line-height: 1.6 !important;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .svgai-page .svg-hero-intro {
+    animation: svg-intro-arrive 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  .svgai-page .svg-generator {
+    animation: svg-intro-arrive 650ms 70ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  @keyframes svg-intro-arrive {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+@media (max-width: 1050px) {
+  .svgai-page .svgai-desktop-nav {
+    display: none;
+  }
+  .svgai-page .svgai-menu-toggle {
+    display: inline-flex;
+  }
+  .svgai-page .svgai-mobile-nav {
+    display: grid;
+    padding: 7px 20px 15px;
+    border-top: 1px solid var(--border);
+    background: var(--background);
+  }
+  .svgai-page .svgai-mobile-nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    padding-block: 12px;
+    color: var(--foreground);
+    font-size: 14px;
+  }
+}
+@media (max-width: 1100px) {
+  .svgai-page .svg-palette {
+    max-width: 204px;
+  }
+  .svgai-page .svg-output-bottom {
+    flex-wrap: wrap;
+  }
+  .svgai-page .svgai-sample-art {
+    height: 270px;
+  }
+  .svgai-page .svgai-sample-landscape .svgai-sample-art,
+  .svgai-page .svgai-sample-butterfly .svgai-sample-art {
+    height: 230px;
+  }
+}
+@media (max-width: 900px) {
+  .svgai-page .svg-hero h1 {
+    font-size: 54px;
+  }
+  .svgai-page .svg-output-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+  }
+  .svgai-page .svg-palette {
+    grid-column: 1/-1;
+    max-width: 100%;
+  }
+  .svgai-page .svg-vector-stats {
+    grid-column: 1;
+    margin: 0;
+    justify-self: start;
+  }
+  .svgai-page .svg-copy-button {
+    grid-column: 2;
+    justify-self: end;
+  }
+  .svgai-page .svg-copy-button span {
+    display: inline;
+  }
+  .svgai-page .svg-download-button {
+    grid-column: 1/-1;
+    width: 100%;
+    justify-content: center;
+    min-height: 42px;
+    margin: 0;
+  }
+}
+@media (max-width: 760px) {
+  .svgai-page .svg-prompt-box textarea {
+    font-size: 16px;
+    line-height: 1.65;
+    min-height: 155px;
+  }
+  .svgai-page .svg-input-note {
+    font-size: 11px;
+  }
+  .svgai-page .svg-hero h1 {
+    font-size: 39px;
+  }
+  .svgai-page .svg-hero-intro > p {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+  .svgai-page .svgai-sample-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 23px 14px;
+  }
+  .svgai-page .svgai-sample {
+    grid-column: span 1;
+  }
+  .svgai-page .svgai-sample-art,
+  .svgai-page .svgai-sample-landscape .svgai-sample-art,
+  .svgai-page .svgai-sample-butterfly .svgai-sample-art {
+    height: auto;
+    aspect-ratio: 1;
+    padding: 15px;
+  }
+  .svgai-page .svgai-sample-art img {
+    inset: 15px;
+    width: calc(100% - 30px);
+    height: calc(100% - 30px);
+  }
+  .svgai-page .svgai-sample-caption {
+    padding-top: 12px;
+  }
+  .svgai-page .svgai-sample-caption strong {
+    font-size: 15px;
+  }
+  .svgai-page .svgai-sample-caption > span {
+    gap: 5px;
+  }
+  .svgai-page .svgai-sample-caption > span > span {
+    font-size: 10px;
+  }
+  .svgai-page .svgai-sample-caption > svg {
+    width: 14px;
+    flex-shrink: 0;
+  }
+  .svgai-page .svg-output-tabs button {
+    padding: 7px 6px;
+  }
+  .svg-output-tools {
+    gap: 5px;
+  }
+  .svgai-page .svg-output-label {
+    font-size: 9px;
+    max-width: 55px;
+    white-space: normal;
+    line-height: 1.3;
+  }
+  .svgai-page .svg-input-body {
+    padding-inline: 18px;
+  }
+  .svgai-page .svg-output-tabs svg {
+    display: none;
+  }
+  .svg-expanded-view {
+    height: calc(100dvh - 24px);
+    width: calc(100vw - 24px);
+    max-width: calc(100vw - 24px);
+  }
+  .svg-expanded-header {
+    padding: 20px;
+    gap: 15px;
+  }
+  .svg-expanded-header h2 {
+    font-size: 22px;
+  }
+  .svg-expanded-header p {
+    font-size: 11px;
+  }
+  .svg-expanded-footer {
+    padding: 16px;
+    gap: 12px;
+  }
+  .svg-expanded-footer > span {
+    font-size: 9px;
+  }
+  .svg-expanded-footer > button {
+    font-size: 11px;
+    padding-inline: 12px;
+  }
+  .svg-curve-canvas {
+    max-height: none;
+  }
+  .svg-curve-caption {
+    padding-inline: 15px;
+  }
+  .svg-curve-hint {
+    padding-inline: 15px;
+    font-size: 10px !important;
+  }
+}
+@media (max-width: 374px) {
+  .svgai-page .svg-hero h1 {
+    font-size: 34px;
+  }
+  .svgai-page .svg-style-options button {
+    font-size: 10px;
+  }
+  .svgai-page .svg-prompt-suggestions button {
+    padding-inline: 6px;
+    font-size: 10px;
+  }
+  .svgai-page .svg-output-top {
+    padding-inline: 12px;
+    gap: 5px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .svg-sample-fill,
+  .svg-sample-outline,
+  .svg-curve-point {
+    transition: none !important;
+  }
+}
+
+/* Keep the compact desktop controls comfortable to operate on touch screens. */
+@media (pointer: coarse), (max-width: 768px) {
+  .svgai-page
+    :is(
+      .svgai-icon-button,
+      .svgai-sign-in,
+      .svg-expand-button,
+      .svg-zoom-controls button,
+      .svg-curve-caption button
+    ) {
+    min-width: 40px;
+    min-height: 40px;
+  }
+  .svgai-page
+    :is(
+      .svg-prompt-suggestions button,
+      .svg-output-tabs button,
+      .svg-copy-button,
+      .svg-option-row select
+    ) {
+    min-height: 40px;
+  }
+  .svgai-page .svg-option-row select {
+    font-size: 16px;
+  }
+  .svgai-page
+    :is(
+      .svgai-footer-links a,
+      .svgai-footer-links button,
+      .svg-credit-balance a,
+      .svg-story-links a
+    ) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 40px;
+  }
+  .svgai-page .svg-color-swatch {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+}

@@ -7,6 +7,7 @@ import { envConfigs } from '@/config';
 import { getStorage } from '@/modules/storage/service';
 import { md5 } from '@/lib/hash';
 import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
+import { readRequestBytes, RequestBodyTooLargeError } from '@/lib/request-body';
 import { respData, respErr } from '@/lib/resp';
 
 // Raster formats only. SVG can carry script and would run on whatever origin
@@ -60,8 +61,17 @@ async function POST({ request }: { request: Request }) {
       return respErr('Upload is larger than 20MB in total');
     }
 
-    const formData = await request.formData();
-    const files = formData.getAll('files') as File[];
+    const bytes = await readRequestBytes(
+      request,
+      MAX_REQUEST_BYTES + 64 * 1024
+    );
+    const formData = await new Response(bytes, {
+      headers: { 'Content-Type': request.headers.get('content-type') || '' },
+    }).formData();
+    const values = formData.getAll('files');
+    if (values.some((value) => typeof value === 'string'))
+      return respErr('Invalid image upload');
+    const files = values as File[];
     if (!files.length) return respErr('No files provided');
     if (files.length > MAX_FILES_PER_REQUEST) {
       return respErr(`At most ${MAX_FILES_PER_REQUEST} files per upload`);
@@ -163,9 +173,10 @@ async function POST({ request }: { request: Request }) {
       urls: uploadResults.map((r) => r.url),
       results: uploadResults,
     });
-  } catch (e: any) {
-    console.error('upload image failed:', e);
-    return respErr(e?.message || 'upload image failed');
+  } catch (e: unknown) {
+    if (e instanceof RequestBodyTooLargeError)
+      return respErr('Upload is larger than 20MB in total', { status: 413 });
+    return respErr('Upload failed', { status: 400 });
   }
 }
 

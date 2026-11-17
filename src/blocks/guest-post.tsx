@@ -3,12 +3,20 @@ import { Check, FileText, Search, Wallet } from 'lucide-react';
 import { Link } from '@/core/i18n/navigation';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
-import { formatPrice, useGuestPostInfo } from '@/hooks/use-guest-posts';
+import {
+  formatPrice,
+  useGuestPostInfo,
+  type GuestPostInfo,
+} from '@/hooks/use-guest-posts';
 import { buttonVariants } from '@/components/ui/button';
 
 // /guest-post: how guest posts work and the packages.
-export function GuestPostLanding() {
-  const { data: info, isPending } = useGuestPostInfo();
+export function GuestPostLanding({
+  initialInfo,
+}: {
+  initialInfo?: GuestPostInfo;
+}) {
+  const { data: info, isPending } = useGuestPostInfo(initialInfo);
   const steps = [
     { icon: FileText, text: m['guest_posts.landing.step_write']() },
     { icon: Search, text: m['guest_posts.landing.step_review']() },

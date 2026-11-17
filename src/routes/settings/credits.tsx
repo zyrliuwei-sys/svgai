@@ -5,6 +5,7 @@ import { Coins } from 'lucide-react';
 
 import { tDynamic } from '@/core/i18n/dynamic';
 import { Link } from '@/core/i18n/navigation';
+import { envConfigs } from '@/config';
 import { apiGet, type PageResult } from '@/lib/api-client';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
@@ -86,13 +87,30 @@ function CreditsPage() {
         <Badge
           variant={r.transactionType === 'consume' ? 'secondary' : 'default'}
         >
-          {r.transactionType}
+          {r.transactionType === 'grant'
+            ? m['settings.credits.tab_grant']()
+            : r.transactionType === 'consume'
+              ? m['settings.credits.tab_consume']()
+              : '—'}
         </Badge>
       ),
     },
     {
       header: m['settings.credits.scene'](),
-      cell: (r) => r.transactionScene || '—',
+      cell: (r) =>
+        r.transactionScene &&
+        [
+          'payment',
+          'subscription',
+          'renewal',
+          'gift',
+          'reward',
+          'refund',
+          'ai_task',
+          'ai_settlement',
+        ].includes(r.transactionScene)
+          ? tDynamic(`settings.credits.source_${r.transactionScene}`)
+          : '—',
     },
     {
       header: m['settings.credits.credits'](),
@@ -207,6 +225,11 @@ function CreditsPage() {
 }
 
 export const Route = createFileRoute('/settings/credits')({
+  head: () => ({
+    meta: [
+      { title: m['settings.credits.title']() + ' | ' + envConfigs.app_name },
+    ],
+  }),
   component: () => (
     <FeatureGate feature="credits">
       <CreditsPage />

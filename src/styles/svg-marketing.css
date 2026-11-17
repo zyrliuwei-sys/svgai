@@ -1,0 +1,725 @@
+/* svgai marketing: editorial paper, functional vector artwork. */
+.svgai-header {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in oklch, var(--background) 94%, transparent);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+}
+.svgai-header-inner {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+.svgai-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -1.1px;
+  text-decoration: none;
+}
+.svgai-brand img {
+  display: block;
+  width: 29px;
+  height: 29px;
+}
+.svgai-desktop-nav {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  margin-left: 75px;
+}
+.svgai-desktop-nav a {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 17px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.svgai-desktop-nav a:hover {
+  color: var(--foreground);
+  background: var(--secondary);
+}
+.svgai-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+.svgai-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted-foreground);
+}
+.svgai-icon-button:hover {
+  background: var(--secondary);
+  color: var(--foreground);
+}
+.svgai-sign-in {
+  display: inline-flex;
+  align-items: center;
+  gap: 13px;
+  min-height: 34px;
+  padding: 0 14px;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-size: 12px;
+  font-weight: 550;
+  border: 1px solid var(--primary);
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.svgai-sign-in:hover {
+  background: var(--svg-accent);
+  border-color: var(--svg-accent);
+  color: var(--card);
+}
+.svgai-account-placeholder {
+  width: 77px;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+.svgai-menu-toggle,
+.svgai-mobile-nav {
+  display: none;
+}
+.svgai-section-intro h2 {
+  font-family: var(--font-serif-display);
+  font-size: clamp(34px, 3.2vw, 44px);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.027em;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.svgai-section-intro > p {
+  margin: 15px 0 0;
+  max-width: 590px;
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 1.7;
+}
+.svgai-showcase {
+  padding-block: 69px 73px;
+  border-top: 1px solid var(--border);
+}
+.svgai-sample-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 30px;
+}
+.svgai-sample {
+  display: block;
+  min-width: 0;
+  text-align: left;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: clip;
+  padding: 0;
+  color: var(--foreground);
+}
+.svgai-sample:hover {
+  border-color: var(--svg-accent);
+}
+.svgai-sample-art {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1.24;
+  padding: 22px;
+  background: var(--svg-paper);
+  overflow: clip;
+}
+.svgai-sample-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: transform 230ms ease;
+}
+.svgai-sample:hover .svgai-sample-art img {
+  transform: scale(1.035);
+}
+.svgai-sample-botanical .svgai-sample-art {
+  background: var(--svg-tint);
+}
+.svgai-sample-orbit .svgai-sample-art {
+  background: color-mix(in oklch, var(--svg-cobalt) 6%, var(--background));
+}
+.svgai-sample-landscape .svgai-sample-art {
+  background: color-mix(in oklch, var(--svg-accent) 7%, var(--background));
+}
+.svgai-sample-caption {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 16px 17px;
+  border-top: 1px solid var(--border);
+  background: var(--card);
+}
+.svgai-sample-caption > span {
+  min-width: 0;
+  display: grid;
+  gap: 6px;
+}
+.svgai-sample-caption strong {
+  font-size: 12px;
+  line-height: 1.3;
+  font-weight: 550;
+}
+.svgai-sample-caption > span > span {
+  color: var(--muted-foreground);
+  font-size: 10px;
+}
+.svgai-sample-caption > svg {
+  flex: 0 0 auto;
+  color: var(--muted-foreground);
+}
+.svgai-workflow-section {
+  padding-block: 66px 80px;
+  border-top: 1px solid var(--border);
+}
+.svgai-workflow {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 52px;
+  padding: 0;
+  margin: 37px 0 55px;
+}
+.svgai-workflow li {
+  display: flex;
+  gap: 17px;
+  position: relative;
+  min-width: 0;
+}
+.svgai-step-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  color: var(--svg-accent);
+}
+.svgai-workflow h3 {
+  font-size: 14px;
+  font-weight: 550;
+  margin: 1px 0 8px;
+}
+.svgai-workflow p {
+  font-size: 12px;
+  line-height: 1.7;
+  margin: 0;
+  color: var(--muted-foreground);
+  max-width: 250px;
+}
+.svgai-step-arrow {
+  position: absolute;
+  right: -35px;
+  top: 10px;
+  color: var(--muted-foreground);
+}
+.svgai-benefit-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr);
+  gap: 20px;
+}
+.svgai-benefit {
+  min-width: 0;
+  min-height: 326px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: clip;
+}
+.svgai-benefit-paths {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 0;
+  background: var(--svg-paper);
+}
+.svgai-benefit-copy {
+  padding: 35px 0 28px 31px;
+  min-width: 0;
+}
+.svgai-benefit-copy h3 {
+  margin: 0;
+  white-space: pre-line;
+  font-family: var(--font-serif-display);
+  font-size: 37px;
+  line-height: 1.05;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+}
+.svgai-benefit-copy p {
+  margin: 19px 0 0;
+  max-width: 260px;
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted-foreground);
+}
+.svgai-benefit-art {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  padding: 20px 19px 18px;
+}
+.svgai-benefit-art img {
+  display: block;
+  width: 100%;
+  max-height: 246px;
+  object-fit: contain;
+}
+.svgai-benefit-art figcaption {
+  margin-top: 7px;
+  color: var(--muted-foreground);
+  font-family: var(--font-mono);
+  font-size: 8px;
+  line-height: 1.5;
+  text-align: center;
+}
+.svgai-benefit-privacy {
+  display: flex;
+  flex-direction: column;
+  padding: 30px 30px 22px;
+  background: var(--card);
+}
+.svgai-privacy-icon {
+  color: var(--svg-accent);
+}
+.svgai-benefit-privacy .svgai-benefit-copy {
+  padding: 20px 0;
+}
+.svgai-benefit-privacy .svgai-benefit-copy p {
+  max-width: 300px;
+}
+.svgai-privacy-note {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: auto 0 0;
+  padding-top: 20px;
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+.svgai-privacy-note > span {
+  color: var(--svg-accent);
+  font-size: 16px;
+}
+.svgai-faq {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.4fr);
+  gap: 90px;
+  padding-block: 65px 90px;
+  border-top: 1px solid var(--border);
+}
+.svgai-faq .svgai-section-intro p {
+  max-width: 255px;
+}
+.svgai-faq-items {
+  min-width: 0;
+}
+.svgai-faq-item {
+  border-bottom: 1px solid var(--border);
+}
+.svgai-faq-item:first-child {
+  border-top: 1px solid var(--border);
+}
+.svgai-faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px 0;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  list-style: none;
+}
+.svgai-faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.svgai-faq-item summary > svg {
+  flex: 0 0 auto;
+  color: var(--muted-foreground);
+  transition: transform 150ms ease;
+}
+.svgai-faq-item[open] summary > svg {
+  transform: rotate(45deg);
+}
+.svgai-faq-item > p {
+  margin: -2px 0 23px;
+  padding-right: 30px;
+  font-size: 12px;
+  line-height: 1.85;
+  color: var(--muted-foreground);
+}
+.svgai-footer {
+  border-top: 1px solid var(--border);
+  background: var(--svg-paper);
+  padding-top: 44px;
+}
+.svgai-footer-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.35fr) minmax(0, 0.4fr);
+  gap: 35px;
+  padding-bottom: 40px;
+}
+.svgai-footer-brand > p {
+  font-size: 13px;
+  line-height: 1.7;
+  margin: 17px 0 0;
+  color: var(--muted-foreground);
+}
+.svgai-footer-links {
+  display: grid;
+  align-content: start;
+  gap: 13px;
+}
+.svgai-footer-links h3 {
+  margin: 0 0 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.svgai-footer-links a {
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--muted-foreground);
+  white-space: nowrap;
+}
+.svgai-footer-links a:hover {
+  color: var(--svg-accent);
+}
+.svgai-footer-links svg {
+  opacity: 0.6;
+}
+.svgai-footer-bottom {
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding-block: 19px;
+}
+.svgai-footer-bottom p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 10px;
+  line-height: 1.6;
+}
+@media (min-width: 1500px) {
+  .svgai-desktop-nav {
+    margin-left: 120px;
+  }
+}
+@media (max-width: 1100px) {
+  .svgai-desktop-nav {
+    margin-left: 15px;
+  }
+  .svgai-desktop-nav a {
+    padding-inline: 12px;
+  }
+  .svgai-faq {
+    gap: 55px;
+  }
+  .svgai-benefit-copy h3 {
+    font-size: 33px;
+  }
+  .svgai-benefit-copy {
+    padding-left: 25px;
+  }
+}
+@media (max-width: 900px) {
+  .svgai-sample-grid {
+    gap: 13px;
+  }
+  .svgai-sample-art {
+    padding: 13px;
+  }
+  .svgai-sample-caption {
+    padding: 13px 11px;
+  }
+  .svgai-sample-caption strong {
+    font-size: 11px;
+  }
+  .svgai-workflow {
+    gap: 35px;
+  }
+  .svgai-workflow li {
+    display: block;
+  }
+  .svgai-step-icon {
+    margin-bottom: 14px;
+  }
+  .svgai-step-arrow {
+    right: -24px;
+  }
+  .svgai-benefit-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
+  }
+  .svgai-benefit-paths {
+    display: flex;
+    flex-direction: column;
+  }
+  .svgai-benefit-copy {
+    padding: 25px;
+  }
+  .svgai-benefit-art {
+    margin-top: -20px;
+    padding: 0 30px 20px;
+  }
+  .svgai-benefit-art img {
+    max-height: 170px;
+  }
+  .svgai-benefit-privacy {
+    padding: 25px;
+  }
+  .svgai-benefit-privacy .svgai-benefit-copy {
+    padding-top: 25px;
+  }
+  .svgai-faq {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr);
+    gap: 30px;
+  }
+  .svgai-faq .svgai-section-intro h2 {
+    font-size: 35px;
+  }
+}
+@media (max-width: 760px) {
+  .svgai-header-inner {
+    height: 60px;
+    gap: 10px;
+  }
+  .svgai-desktop-nav {
+    display: none;
+  }
+  .svgai-header-actions {
+    gap: 6px;
+  }
+  .svgai-menu-toggle {
+    display: inline-flex;
+  }
+  .svgai-mobile-nav {
+    display: grid;
+    padding: 7px 20px 15px;
+    border-top: 1px solid var(--border);
+    background: var(--background);
+  }
+  .svgai-mobile-nav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 14px 0;
+    font-size: 14px;
+    color: var(--foreground);
+  }
+  .svgai-mobile-nav a:hover {
+    color: var(--svg-accent);
+  }
+  .svgai-showcase {
+    padding-block: 46px 48px;
+  }
+  .svgai-section-intro > p {
+    font-size: 13px;
+    line-height: 1.8;
+    margin-top: 12px;
+  }
+  .svgai-sample-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 26px;
+  }
+  .svgai-sample-art {
+    aspect-ratio: 1.15;
+    padding: 18px;
+  }
+  .svgai-workflow-section {
+    padding-block: 45px 50px;
+  }
+  .svgai-workflow {
+    display: flex;
+    flex-direction: column;
+    gap: 26px;
+    margin-block: 29px 36px;
+  }
+  .svgai-workflow li {
+    display: flex;
+    gap: 16px;
+  }
+  .svgai-step-icon {
+    margin-bottom: 0;
+  }
+  .svgai-workflow h3 {
+    font-size: 14px;
+    margin-top: 0;
+  }
+  .svgai-workflow p {
+    max-width: 410px;
+    font-size: 12px;
+  }
+  .svgai-step-arrow {
+    display: none;
+  }
+  .svgai-benefit-grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 15px;
+  }
+  .svgai-benefit {
+    min-height: 0;
+  }
+  .svgai-benefit-paths {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  }
+  .svgai-benefit-copy h3 {
+    font-size: 34px;
+  }
+  .svgai-benefit-art {
+    margin: 0;
+    padding: 14px;
+  }
+  .svgai-benefit-art img {
+    max-height: 215px;
+  }
+  .svgai-benefit-art figcaption {
+    display: none;
+  }
+  .svgai-benefit-privacy {
+    padding: 24px;
+  }
+  .svgai-benefit-privacy .svgai-benefit-copy {
+    padding: 18px 0 0;
+  }
+  .svgai-benefit-privacy .svgai-benefit-copy h3 {
+    white-space: normal;
+    font-size: 33px;
+  }
+  .svgai-benefit-privacy .svgai-benefit-copy p {
+    max-width: 100%;
+    margin-top: 13px;
+  }
+  .svgai-privacy-note {
+    padding-top: 18px;
+  }
+  .svgai-faq {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 26px;
+    padding-block: 44px 55px;
+  }
+  .svgai-faq .svgai-section-intro p {
+    max-width: 100%;
+  }
+  .svgai-faq .svgai-section-intro h2 {
+    font-size: 34px;
+  }
+  .svgai-faq-item summary {
+    font-size: 12px;
+    padding-block: 19px;
+    line-height: 1.6;
+    gap: 15px;
+  }
+  .svgai-faq-item > p {
+    font-size: 12px;
+    padding-right: 14px;
+  }
+  .svgai-footer {
+    padding-top: 33px;
+  }
+  .svgai-footer-top {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 30px 22px;
+    padding-bottom: 30px;
+  }
+  .svgai-footer-brand {
+    grid-column: 1 / -1;
+  }
+  .svgai-footer-brand > p {
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  .svgai-footer-bottom {
+    display: block;
+    padding-block: 18px;
+  }
+  .svgai-footer-bottom p + p {
+    margin-top: 7px;
+  }
+}
+@media (max-width: 375px) {
+  .svgai-header-actions {
+    gap: 2px;
+  }
+  .svgai-brand {
+    font-size: 22px;
+    gap: 7px;
+  }
+  .svgai-brand img {
+    width: 26px;
+    height: 26px;
+  }
+  .svgai-sign-in {
+    padding-inline: 10px;
+    gap: 8px;
+    font-size: 11px;
+  }
+  .svgai-sample-caption {
+    padding: 12px 10px;
+  }
+  .svgai-sample-caption strong {
+    font-size: 10px;
+  }
+  .svgai-sample-caption > span > span {
+    font-size: 9px;
+  }
+  .svgai-sample-art {
+    padding: 12px;
+  }
+  .svgai-benefit-paths {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .svgai-benefit-paths .svgai-benefit-art {
+    max-height: 200px;
+  }
+  .svgai-benefit-copy {
+    padding: 23px;
+  }
+  .svgai-section-intro h2 {
+    font-size: 32px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .svgai-sample-art img,
+  .svgai-faq-item summary > svg {
+    transition: none;
+  }
+}

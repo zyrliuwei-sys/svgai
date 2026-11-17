@@ -1,6 +1,5 @@
 import { useRouter, useRouterState } from '@tanstack/react-router';
 
-import { tDynamic } from '@/core/i18n/dynamic';
 import {
   appearanceStyle,
   COLOR_MODES,
@@ -18,6 +17,7 @@ import {
   type ThemeId,
 } from '@/config/appearance';
 import { deleteCookie, setCookie } from '@/lib/cookie';
+import { m } from '@/paraglide/messages.js';
 import type { AppearanceOption } from '@/components/appearance-options';
 
 // Appearance (theme, font, size, sidebar), resolved server-side by the root
@@ -94,36 +94,73 @@ export function paintAppearance(a: Appearance) {
 }
 
 /** Localized picker options for one appearance part. */
+const labels = {
+  theme: {
+    classic: m['common.themes.classic'],
+    forest: m['common.themes.forest'],
+    ocean: m['common.themes.ocean'],
+    violet: m['common.themes.violet'],
+    sunset: m['common.themes.sunset'],
+    rose: m['common.themes.rose'],
+    slate: m['common.themes.slate'],
+  },
+  font: {
+    inter: m['common.fonts.inter'],
+    system: m['common.fonts.system'],
+    rounded: m['common.fonts.rounded'],
+    serif: m['common.fonts.serif'],
+  },
+  sidebarVariant: {
+    inset: m['common.sidebar_variants.inset'],
+    floating: m['common.sidebar_variants.floating'],
+    sidebar: m['common.sidebar_variants.sidebar'],
+  },
+  sidebarCollapsible: {
+    offcanvas: m['common.sidebar_collapsibles.offcanvas'],
+    icon: m['common.sidebar_collapsibles.icon'],
+  },
+  fontSize: {
+    sm: m['common.font_sizes.sm'],
+    md: m['common.font_sizes.md'],
+    lg: m['common.font_sizes.lg'],
+  },
+  colorMode: {
+    system: m['common.color_modes.system'],
+    light: m['common.color_modes.light'],
+    dark: m['common.color_modes.dark'],
+  },
+};
+
 export function appearanceOptions(key: AppearanceKey): AppearanceOption[] {
   if (key === 'theme') {
     return THEMES.map((t) => ({
       id: t.id,
-      label: tDynamic(`common.themes.${t.id}`),
+      label: labels.theme[t.id](),
       swatch: t.swatch,
     }));
   }
   if (key === 'font') {
     return FONTS.map((f) => ({
       id: f.id,
-      label: tDynamic(`common.fonts.${f.id}`),
+      label: labels.font[f.id](),
       fontFamily: f.stack,
     }));
   }
   if (key === 'sidebarVariant') {
     return SIDEBAR_VARIANTS.map((v) => ({
       id: v.id,
-      label: tDynamic(`common.sidebar_variants.${v.id}`),
+      label: labels.sidebarVariant[v.id](),
     }));
   }
   if (key === 'sidebarCollapsible') {
     return SIDEBAR_COLLAPSIBLES.map((v) => ({
       id: v.id,
-      label: tDynamic(`common.sidebar_collapsibles.${v.id}`),
+      label: labels.sidebarCollapsible[v.id](),
     }));
   }
   return FONT_SIZES.map((f) => ({
     id: f.id,
-    label: tDynamic(`common.font_sizes.${f.id}`),
+    label: labels.fontSize[f.id](),
   }));
 }
 
@@ -131,6 +168,6 @@ export function appearanceOptions(key: AppearanceKey): AppearanceOption[] {
 export function colorModeOptions(): AppearanceOption[] {
   return COLOR_MODES.map((c) => ({
     id: c.id,
-    label: tDynamic(`common.color_modes.${c.id}`),
+    label: labels.colorMode[c.id](),
   }));
 }

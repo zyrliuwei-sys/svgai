@@ -654,3 +654,45 @@ grant_<orderNo>`, so the unique index allows one grant per order. Older
   `utm_source` filter (`users_sources` operation, `GET /api/admin/users/sources`,
   `users.read`). The subscriptions and credits list APIs now also return
   `userName` / `userImage`.
+
+## 2026-11-17 — SVG generation billing and product catalog
+
+The SVG generator now uses the saved SeeAPI settings and GPT Image 2.6 Sunburst.
+`GET /api/svg/generate` returns availability, balance and the 160-credit reservation;
+`POST` requires a stable UUID `requestId`. Query the returned task with
+`GET /api/svg/generate?taskId=...`. Charges settle at `ceil(consumed_credits × 8)`.
+Task creation, reservations, final charges and refunds use atomic batches and
+unique ledger keys; browser retries reuse the same upstream idempotency key.
+Pending tasks resume on the same browser after a reload. No schema migration is needed.
+
+The product catalog now contains `starter_once`, `pro_once`, `studio_once` and
+`starter_monthly`, `pro_monthly`, `studio_monthly`. Old yearly/lifetime products
+are no longer offered; existing orders and subscription renewals retain their
+stored price and credit allowance. Enable a USD payment provider in admin settings,
+and configure corresponding product IDs if required by that provider, before selling.
+Monthly credits expire at the paid period end; one-time credits do not expire.
+
+## 2026-11-17 — Launch audit hardening
+
+- Set `VITE_APP_URL` to the public origin **at build time**. Canonicals, language
+  alternates, social metadata, robots and sitemap URLs now share this value.
+- Docker excludes every local `.env.*` file from its build context. Pass public
+  branding through `--build-arg VITE_APP_URL=https://your-domain.example` and
+  `--build-arg VITE_APP_NAME=your-app`; inject database, auth, payment and
+  `CONFIG_ENCRYPTION_KEY` secrets only at runtime (for example, `--env-file`).
+  Rebuild existing images; do not pass secrets as build arguments.
+- Dependency overrides and build-script permissions now live in
+  `pnpm-workspace.yaml`, so pnpm 10 and 11 use the same patched versions. Run
+  `pnpm install --frozen-lockfile` after pulling. Seroval is pinned to 1.6.11;
+  legacy esbuild and minimatch dependencies also use patched versions.
+- Cookie-authenticated writes to application APIs require a same-origin browser
+  request. Scripted clients using cookies must send `Origin` matching the app's
+  public URL; admin bearer-key clients without cookies keep their existing flow.
+  Authentication and signed payment notifications retain their own validation.
+  Production authentication no longer implicitly trusts every localhost origin;
+  list any intentional local client origin in `AUTH_TRUSTED_ORIGINS`.
+- Account, admin, auth and API responses use `Cache-Control: no-store` and
+  `X-Robots-Tag: noindex, nofollow`. Cross-origin referrers are limited to origins.
+  Streamed image uploads are capped before multipart parsing, even without a
+  `Content-Length` header. Unsafe login return paths now fall back to the account
+  page. No database migration is required.

@@ -7,6 +7,8 @@ import { resetPassword } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
 import { m } from '@/paraglide/messages.js';
+import { AuthBrand } from '@/blocks/auth-brand';
+import { AuthHelp } from '@/blocks/auth-help';
 import { TextField } from '@/components/form-field';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,8 +22,8 @@ import { Field, FieldDescription, FieldGroup } from '@/components/ui/field';
 
 const resetSchema = z
   .object({
-    password: z.string().min(8),
-    confirmPassword: z.string().min(8),
+    password: z.string().min(8, m['common.sign.password_min_length']()),
+    confirmPassword: z.string().min(8, m['common.sign.password_min_length']()),
   })
   .refine((d) => d.password === d.confirmPassword, {
     path: ['confirmPassword'],
@@ -70,15 +72,16 @@ function ResetPasswordPage() {
   });
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="self-center font-serif text-lg italic">
+    <div className="svgai-page svg-auth-shell">
+      <AuthBrand />
+      <div className="svg-auth-form flex w-full max-w-sm flex-col gap-6">
+        <Link href="/" className="svg-auth-form-brand">
           {envConfigs.app_name}
         </Link>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">
-              {m['common.sign.reset_password_title']()}
+              <h1>{m['common.sign.reset_password_title']()}</h1>
             </CardTitle>
             {!success && tokenChecked && token && (
               <CardDescription>
@@ -178,11 +181,13 @@ function ResetPasswordPage() {
             )}
           </CardContent>
         </Card>
+        <AuthHelp />
       </div>
     </div>
   );
 }
 
 export const Route = createFileRoute('/(auth)/reset-password')({
+  head: () => ({ meta: [{ title: m['common.sign.reset_password_title']() }] }),
   component: ResetPasswordPage,
 });

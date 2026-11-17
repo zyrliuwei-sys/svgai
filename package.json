@@ -34,7 +34,9 @@
     "test:payment": "node --import tsx --test tests/payment-idempotency.test.ts tests/payment-guards.test.ts tests/refund.test.ts",
     "test:atomic": "node --import tsx --test tests/atomic.test.ts",
     "test:atomic:d1": "ATOMIC_D1=1 node --import tsx --test tests/atomic.test.ts",
-    "test:atomic:pg": "TSX_TSCONFIG_PATH=tests/tsconfig.pg.json node --import tsx --test tests/atomic.test.ts"
+    "test:atomic:pg": "TSX_TSCONFIG_PATH=tests/tsconfig.pg.json node --import tsx --test tests/atomic.test.ts",
+    "test:svg": "node --import tsx --test tests/svg-generator.test.ts tests/svg-vectorizer.test.ts tests/svg-billing.test.ts tests/svg-preview.test.ts",
+    "test:svg:d1": "ATOMIC_D1=1 node --import tsx --test tests/svg-billing.test.ts tests/svg-preview.test.ts"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,mjs,cjs}": "prettier --write",
@@ -42,13 +44,17 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
+    "@cf-wasm/resvg": "^0.4.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/modifiers": "^9.0.0",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
+    "@fontsource-variable/geist": "^5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/nunito": "^5.3.0",
     "@fontsource-variable/source-serif-4": "^5.3.1",
+    "@fontsource/instrument-serif": "^5.3.0",
     "@fontsource/libre-baskerville": "^5.3.0",
     "@libsql/client": "^0.14.0",
     "@mdx-js/react": "^3.1.1",
@@ -69,6 +75,9 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "drizzle-orm": "^0.45.4",
+    "fast-png": "^8.0.0",
+    "fflate": "^0.8.3",
+    "imagetracerjs": "^1.2.6",
     "lucide-react": "^0.511.0",
     "markdown-it": "^14.3.3",
     "motion": "^12.43.0",
@@ -117,19 +126,5 @@
     "typescript": "^5.9.3",
     "vite": "^8.3.5",
     "wrangler": "^4.154.0"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@parcel/watcher",
-      "@swc/core",
-      "esbuild",
-      "msw",
-      "sharp"
-    ],
-    "overrides": {
-      "seroval": "1.6.8",
-      "seroval-plugins": "1.6.8",
-      "next": "-"
-    }
   }
 }

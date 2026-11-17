@@ -10,6 +10,8 @@ import { resolveAfterAuthUrl, safeInternalPath } from '@/lib/redirect';
 import { m } from '@/paraglide/messages.js';
 import { localizeHref } from '@/paraglide/runtime.js';
 import { usePublicConfig } from '@/hooks/use-public-config';
+import { AuthBrand } from '@/blocks/auth-brand';
+import { AuthHelp } from '@/blocks/auth-help';
 import { TextField } from '@/components/form-field';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -23,8 +25,8 @@ import {
 import { Input } from '@/components/ui/input';
 
 const signInSchema = z.object({
-  email: z.string().email(m['common.sign.email_placeholder']()),
-  password: z.string().min(1),
+  email: z.string().email(m['common.sign.email_invalid']()),
+  password: z.string().min(1, m['common.sign.password_required']()),
 });
 
 function SignInPage() {
@@ -39,22 +41,37 @@ function SignInPage() {
   // `myapp://auth/callback`, which detours through /auth-callback for a token.
   const [redirectParam, setRedirectParam] = useState<string | null>(null);
   const [callbackUrl, setCallbackUrl] = useState<string | null>(null);
+  const [paramsReady, setParamsReady] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setRedirectParam(params.get('redirect'));
     setCallbackUrl(params.get('callbackUrl'));
+    setParamsReady(true);
   }, []);
 
   // Already signed in (visited /sign-in directly, or a stale callbackUrl looped
   // back here) → go home. The auth pages never gate themselves, so this can't loop.
   useEffect(() => {
-    if (sessionPending || navigatingRef.current) return;
+    if (sessionPending || !paramsReady || navigatingRef.current) return;
     if (session?.user) {
       navigatingRef.current = true;
-      router.push('/');
+      router.replace(
+        resolveAfterAuthUrl({
+          redirect: redirectParam,
+          callbackUrl,
+          fallback: '/settings',
+        })
+      );
     }
-  }, [sessionPending, session?.user, router]);
+  }, [
+    sessionPending,
+    session?.user,
+    router,
+    paramsReady,
+    redirectParam,
+    callbackUrl,
+  ]);
 
   // Allow only same-site relative paths, and never an auth page (would loop).
   const safeCallbackUrl = safeInternalPath(callbackUrl);
@@ -132,15 +149,16 @@ function SignInPage() {
   }
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="self-center font-serif text-lg italic">
+    <div className="svgai-page svg-auth-shell">
+      <AuthBrand />
+      <div className="svg-auth-form flex w-full max-w-sm flex-col gap-6">
+        <Link href="/" className="svg-auth-form-brand">
           {configs.app_name || envConfigs.app_name}
         </Link>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">
-              {m['common.sign.sign_in_title']()}
+              <h1>{m['common.sign.sign_in_title']()}</h1>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -224,6 +242,7 @@ function SignInPage() {
                             field={field}
                             label={m['common.sign.email_title']()}
                             type="email"
+                            autoComplete="email"
                             required
                             placeholder={m['common.sign.email_placeholder']()}
                           />
@@ -261,6 +280,7 @@ function SignInPage() {
                                 id={field.name}
                                 name={field.name}
                                 type="password"
+                                autoComplete="current-password"
                                 value={field.state.value}
                                 onChange={(e) =>
                                   field.handleChange(e.target.value)
@@ -286,7 +306,7 @@ function SignInPage() {
                           {(isSubmitting) => (
                             <Button type="submit" disabled={isSubmitting}>
                               {isSubmitting
-                                ? '...'
+                                ? m['common.sign.signing_in']()
                                 : m['common.sign.sign_in_title']()}
                             </Button>
                           )}
@@ -308,11 +328,18 @@ function SignInPage() {
             )}
           </CardContent>
         </Card>
+        <AuthHelp />
       </div>
     </div>
   );
 }
 
 export const Route = createFileRoute('/(auth)/sign-in')({
+  head: () => ({
+    meta: [
+      { title: m['common.sign.sign_in_title']() + ' | ' + envConfigs.app_name },
+      { name: 'robots', content: 'noindex, follow' },
+    ],
+  }),
   component: SignInPage,
 });

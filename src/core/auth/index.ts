@@ -25,6 +25,7 @@ import {
   sanitizeUtm,
 } from '@/lib/cookie';
 import { getUuid } from '@/lib/hash';
+import { escapeHtml } from '@/lib/html';
 import { OPERATIONS_COOKIE, readVisitorCookie } from '@/lib/operations-cookie';
 
 function assertProductionAuthSecret() {
@@ -231,7 +232,8 @@ export function getAuth(configs?: Record<string, string>) {
         const origin = request?.headers?.get?.('origin');
         if (origin) {
           const host = new URL(origin).hostname;
-          if (host === 'localhost') origins.push(origin);
+          if (process.env.NODE_ENV !== 'production' && host === 'localhost')
+            origins.push(origin);
           const suffixMatched = extra.some(
             (rule) =>
               rule.startsWith('.') &&
@@ -420,9 +422,9 @@ export function getAuth(configs?: Record<string, string>) {
           to: user.email,
           subject: `Reset your ${appName} password`,
           text: `${greeting}\n\nYou recently requested to reset your password for ${appName}. Use the link below to choose a new one:\n\n${url}\n\nThis link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.`,
-          html: `<p>${greeting}</p>
-<p>You recently requested to reset your password for <strong>${appName}</strong>. Click the link below to choose a new one:</p>
-<p><a href="${url}">Reset your password</a></p>
+          html: `<p>${escapeHtml(greeting)}</p>
+<p>You recently requested to reset your password for <strong>${escapeHtml(appName)}</strong>. Click the link below to choose a new one:</p>
+<p><a href="${escapeHtml(url)}">Reset your password</a></p>
 <p>This link will expire in 1 hour. If you didn't request a password reset, you can safely ignore this email.</p>`,
         });
         if (!result.success) {

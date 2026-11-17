@@ -1,331 +1,228 @@
-'use client';
-
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import {
-  Check,
-  Folder,
-  Folders,
-  Headphones,
-  Infinity as InfinityIcon,
-  Mail,
-  Puzzle,
-  Sparkles,
-  Terminal,
-  Zap,
-} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { useSession } from '@/core/auth/client';
 import { useRouter } from '@/core/i18n/navigation';
+import { SVG_RESERVED_CREDITS } from '@/config/generation';
+import { pricingCatalog } from '@/config/pricing';
 import { apiPost } from '@/lib/api-client';
-import { currentPathWithQuery } from '@/lib/redirect';
+import { track } from '@/lib/track';
 import { m } from '@/paraglide/messages.js';
-import { getLocale } from '@/paraglide/runtime.js';
 import { usePublicConfig } from '@/hooks/use-public-config';
 import {
   PaymentProviderModal,
   type PaymentProvider,
 } from '@/components/payment-provider-modal';
-import {
-  PricingTable,
-  type PricingGroup,
-  type PricingPlan,
-} from '@/components/pricing-table';
+import { SvgPricing, type SvgPricingGroup } from '@/components/svg-pricing';
 
-const ALL_PROVIDERS: PaymentProvider[] = [
-  'stripe',
-  'creem',
-  'paypal',
-  'alipay',
-  'wechat',
-];
+import '@/styles/svg-pricing.css';
 
-export function Pricing({ title }: { title?: string } = {}) {
+const ALL_PROVIDERS: PaymentProvider[] = ['stripe', 'creem', 'paypal'];
+export function Pricing({ headingLevel = 1 }: { headingLevel?: 1 | 2 } = {}) {
   const router = useRouter();
+  const [initialGroup, setInitialGroup] = useState('once');
+  useEffect(() => {
+    const selected = new URLSearchParams(window.location.search).get('plan');
+    if (
+      selected &&
+      pricingCatalog[selected] &&
+      pricingCatalog[selected].kind !== 'guest_post'
+    )
+      setInitialGroup(pricingCatalog[selected].plan ? 'monthly' : 'once');
+  }, []);
   const { data: session } = useSession();
-
-  const { data: configsData } = usePublicConfig();
-  const configs = configsData ?? {};
+  const { data: configs = {} } = usePublicConfig();
+  const [pendingId, setPendingId] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [pendingPlan, setPendingPlan] = useState<PricingPlan | null>(null);
   const [loadingProvider, setLoadingProvider] =
     useState<PaymentProvider | null>(null);
-
-  const enabledProviders = useMemo<PaymentProvider[]>(
+  const enabledProviders = useMemo(
     () => ALL_PROVIDERS.filter((p) => configs[`${p}_enabled`] === 'true'),
     [configs]
   );
-
-  const starterFeatures = [
-    { icon: Folder, label: m['landing.pricing.feature_1_project']() },
-    { icon: Sparkles, label: m['landing.pricing.feature_5k_credits']() },
-    { icon: Mail, label: m['landing.pricing.feature_email_support']() },
-  ];
-  const proFeatures = [
-    { icon: Folders, label: m['landing.pricing.feature_unlimited_projects']() },
-    { icon: Sparkles, label: m['landing.pricing.feature_50k_credits']() },
-    { icon: Zap, label: m['landing.pricing.feature_priority_support']() },
-    { icon: Terminal, label: m['landing.pricing.feature_api_access']() },
-  ];
-  const enterpriseFeatures = [
-    { icon: Check, label: m['landing.pricing.feature_everything_pro']() },
-    {
-      icon: InfinityIcon,
-      label: m['landing.pricing.feature_unlimited_credits'](),
-    },
-    {
-      icon: Headphones,
-      label: m['landing.pricing.feature_dedicated_support'](),
-    },
-    { icon: Puzzle, label: m['landing.pricing.feature_custom_integrations']() },
-  ];
-
-  const groups: PricingGroup[] = [
-    {
-      key: 'monthly',
-      label: m['landing.pricing.monthly'](),
-      plans: [
-        {
-          id: 'starter-monthly',
-          name: m['landing.pricing.starter'](),
-          description: m['landing.pricing.starter_desc'](),
-          price: '$9',
-          interval: 'mo',
-          features: starterFeatures,
-          productId: 'starter_monthly',
-          priceInCents: 900,
-          currency: 'usd',
-          credits: 5000,
-          plan: { name: 'Starter', interval: 'month', intervalCount: 1 },
-        },
-        {
-          id: 'pro-monthly',
-          name: m['landing.pricing.pro'](),
-          description: m['landing.pricing.pro_desc'](),
-          price: '$29',
-          interval: 'mo',
-          featured: true,
-          badge: m['landing.pricing.popular'](),
-          features: proFeatures,
-          productId: 'pro_monthly',
-          priceInCents: 2900,
-          currency: 'usd',
-          credits: 50000,
-          plan: { name: 'Pro', interval: 'month', intervalCount: 1 },
-        },
-        {
-          id: 'enterprise-monthly',
-          name: m['landing.pricing.enterprise'](),
-          description: m['landing.pricing.enterprise_desc'](),
-          price: '$99',
-          interval: 'mo',
-          features: enterpriseFeatures,
-          productId: 'enterprise_monthly',
-          priceInCents: 9900,
-          currency: 'usd',
-          credits: 500000,
-          plan: { name: 'Enterprise', interval: 'month', intervalCount: 1 },
-        },
-      ],
-    },
-    {
-      key: 'yearly',
-      label: m['landing.pricing.yearly'](),
-      plans: [
-        {
-          id: 'starter-yearly',
-          name: m['landing.pricing.starter'](),
-          description: m['landing.pricing.starter_desc'](),
-          price: '$86',
-          originalPrice: '$108',
-          interval: 'yr',
-          features: starterFeatures,
-          productId: 'starter_yearly',
-          priceInCents: 8600,
-          currency: 'usd',
-          credits: 60000,
-          plan: { name: 'Starter', interval: 'year', intervalCount: 1 },
-        },
-        {
-          id: 'pro-yearly',
-          name: m['landing.pricing.pro'](),
-          description: m['landing.pricing.pro_desc'](),
-          price: '$278',
-          originalPrice: '$348',
-          interval: 'yr',
-          featured: true,
-          badge: m['landing.pricing.popular'](),
-          features: proFeatures,
-          productId: 'pro_yearly',
-          priceInCents: 27800,
-          currency: 'usd',
-          credits: 600000,
-          plan: { name: 'Pro', interval: 'year', intervalCount: 1 },
-        },
-        {
-          id: 'enterprise-yearly',
-          name: m['landing.pricing.enterprise'](),
-          description: m['landing.pricing.enterprise_desc'](),
-          price: '$950',
-          originalPrice: '$1,188',
-          interval: 'yr',
-          features: enterpriseFeatures,
-          productId: 'enterprise_yearly',
-          priceInCents: 95000,
-          currency: 'usd',
-          credits: 6000000,
-          plan: { name: 'Enterprise', interval: 'year', intervalCount: 1 },
-        },
-      ],
-    },
-    {
-      key: 'lifetime',
-      label: m['landing.pricing.lifetime'](),
-      plans: [
-        {
-          id: 'starter-lifetime',
-          name: m['landing.pricing.starter'](),
-          description: m['landing.pricing.starter_desc'](),
-          price: '$149',
-          features: starterFeatures,
-          productId: 'starter_lifetime',
-          priceInCents: 14900,
-          currency: 'usd',
-          credits: 100000,
-          buttonText: m['landing.pricing.buy_lifetime'](),
-        },
-        {
-          id: 'pro-lifetime',
-          name: m['landing.pricing.pro'](),
-          description: m['landing.pricing.pro_desc'](),
-          price: '$499',
-          features: proFeatures,
-          featured: true,
-          badge: m['landing.pricing.best_value'](),
-          productId: 'pro_lifetime',
-          priceInCents: 49900,
-          currency: 'usd',
-          credits: 1000000,
-          buttonText: m['landing.pricing.buy_lifetime'](),
-        },
-        {
-          id: 'enterprise-lifetime',
-          name: m['landing.pricing.enterprise'](),
-          description: m['landing.pricing.enterprise_desc'](),
-          price: '$1,999',
-          features: enterpriseFeatures,
-          productId: 'enterprise_lifetime',
-          priceInCents: 199900,
-          currency: 'usd',
-          credits: 10000000,
-          buttonText: m['landing.pricing.buy_lifetime'](),
-        },
-      ],
-    },
-  ];
-
-  const checkoutMutation = useMutation({
-    mutationFn: ({
-      plan,
-      provider,
-    }: {
-      plan: PricingPlan;
-      provider: PaymentProvider;
-    }) =>
+  const checkout = useMutation({
+    mutationFn: ({ id, provider }: { id: string; provider: PaymentProvider }) =>
       apiPost<{ checkout_url?: string }>('/api/payment/checkout', {
-        product_id: plan.productId,
-        product_name: plan.productName || plan.name,
-        plan_name: plan.plan?.name || plan.name,
-        price: plan.priceInCents,
-        currency: plan.currency || 'usd',
-        type: plan.plan ? 'subscription' : 'one-time',
-        description: plan.name,
-        plan: plan.plan,
-        credits: plan.credits,
-        credits_valid_days: plan.creditsValidDays,
+        product_id: id,
         payment_provider: provider,
-        // Land on the order list so the user sees the payment they just made.
-        redirect: '/settings/payments',
-        locale: getLocale(),
+        redirect: new URLSearchParams(window.location.search).has('preview')
+          ? '/?resumePreview=1#generator'
+          : '/settings/payments',
       }),
     onSuccess: (data) => {
-      if (!data?.checkout_url) {
-        toast.error('Checkout failed');
-        setLoadingProvider(null);
-        return;
-      }
-      window.location.href = data.checkout_url;
+      if (data.checkout_url) window.location.assign(data.checkout_url);
+      else toast.error(m['svgai.pricing.checkout_error']());
     },
-    onError: (err: any) => {
-      toast.error(err?.message || 'Checkout failed');
+    onError: (error: Error) => toast.error(error.message),
+    onSettled: () => {
       setLoadingProvider(null);
+      setPendingId(null);
     },
   });
-
-  function startCheckout(plan: PricingPlan, provider: PaymentProvider) {
+  const groups: SvgPricingGroup[] = (['once', 'monthly'] as const).map(
+    (group) => ({
+      id: group,
+      label:
+        group === 'once'
+          ? m['svgai.pricing.once']()
+          : m['svgai.pricing.monthly'](),
+      note:
+        group === 'once'
+          ? m['svgai.pricing.once_note']()
+          : m['svgai.pricing.monthly_note'](),
+      interval:
+        group === 'once'
+          ? m['svgai.pricing.one_time']()
+          : m['svgai.pricing.per_month'](),
+      cta:
+        group === 'once'
+          ? m['svgai.pricing.buy_credits']()
+          : m['svgai.pricing.subscribe'](),
+      plans: (['starter', 'pro', 'studio'] as const).map((tier) => {
+        const product = pricingCatalog[`${tier}_${group}`];
+        return {
+          id: product.productId,
+          name:
+            tier === 'starter'
+              ? m['svgai.pricing.starter']()
+              : tier === 'pro'
+                ? m['svgai.pricing.pro']()
+                : m['svgai.pricing.studio'](),
+          description:
+            tier === 'starter'
+              ? m['svgai.pricing.starter_desc']()
+              : tier === 'pro'
+                ? m['svgai.pricing.pro_desc']()
+                : m['svgai.pricing.studio_desc'](),
+          price: new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: product.currency,
+            maximumFractionDigits: 0,
+          }).format(product.priceInCents / 100),
+          credits: product.credits.toLocaleString('en-US'),
+          estimate: m['svgai.pricing.estimate']({
+            count: Math.floor(product.credits / SVG_RESERVED_CREDITS),
+          }),
+          ...(group === 'monthly'
+            ? {
+                comparison: new Intl.NumberFormat('en-US', {
+                  style: 'currency',
+                  currency: product.currency,
+                  maximumFractionDigits: 0,
+                }).format(pricingCatalog[`${tier}_once`].priceInCents / 100),
+                savings: m['svgai.pricing.savings']({
+                  percent: Math.round(
+                    (1 -
+                      product.priceInCents /
+                        pricingCatalog[`${tier}_once`].priceInCents) *
+                      100
+                  ),
+                }),
+              }
+            : {}),
+          featured: tier === 'pro',
+        };
+      }),
+    })
+  );
+  function start(id: string, provider: PaymentProvider) {
+    setPendingId(id);
     setLoadingProvider(provider);
-    checkoutMutation.mutate({ plan, provider });
+    checkout.mutate({ id, provider });
   }
-
-  async function handleCheckout(plan: PricingPlan) {
+  function handleCheckout(id: string) {
+    track('plan_selected', {
+      product: id,
+      interval: pricingCatalog[id].plan?.interval || 'once',
+    });
     if (!session?.user) {
-      const callbackUrl = encodeURIComponent(currentPathWithQuery('/pricing'));
-      router.push(`/sign-in?callbackUrl=${callbackUrl}`);
+      const preview = new URLSearchParams(window.location.search).get(
+        'preview'
+      );
+      router.push(
+        `/sign-in?callbackUrl=${encodeURIComponent(`/pricing?plan=${id}${preview ? '&preview=' + encodeURIComponent(preview) : ''}#pricing`)}`
+      );
       return;
     }
-
-    const selectEnabled = configs.select_payment_enabled === 'true';
-    const defaultProvider = (configs.default_payment_provider ||
-      enabledProviders[0] ||
-      'stripe') as PaymentProvider;
-
-    if (selectEnabled && enabledProviders.length > 1) {
-      setPendingPlan(plan);
+    if (!enabledProviders.length) {
+      toast.error(m['svgai.pricing.payment_unavailable']());
+      return;
+    }
+    if (
+      configs.select_payment_enabled === 'true' &&
+      enabledProviders.length > 1
+    ) {
+      setPendingId(id);
       setModalOpen(true);
       return;
     }
-
-    await startCheckout(plan, defaultProvider);
+    const configured = configs.default_payment_provider as PaymentProvider;
+    start(
+      id,
+      enabledProviders.includes(configured) ? configured : enabledProviders[0]
+    );
   }
-
-  function handleProviderSelect(provider: PaymentProvider) {
-    if (!pendingPlan) return;
-    startCheckout(pendingPlan, provider);
-  }
-
   return (
-    <section
-      id="pricing"
-      className="border-border border-t px-4 py-24 sm:py-32"
-    >
-      <div className="mx-auto max-w-5xl">
-        <div className="mb-20 text-center">
-          <h2 className="font-serif text-4xl font-normal tracking-tight sm:text-5xl">
-            {title ?? m['landing.pricing.title']()}
-          </h2>
-          <p className="text-muted-foreground mt-5">
-            {m['landing.pricing.description']()}
-          </p>
-        </div>
-        <PricingTable groups={groups} onCheckout={handleCheckout} />
-      </div>
-
+    <>
+      <SvgPricing
+        headingLevel={headingLevel}
+        initialGroup={initialGroup}
+        groups={groups}
+        onCheckout={handleCheckout}
+        loadingId={checkout.isPending ? pendingId : null}
+        copy={{
+          eyebrow: m['svgai.pricing.eyebrow'](),
+          title: m['svgai.pricing.title'](),
+          description: m['svgai.pricing.description'](),
+          popular: m['svgai.pricing.popular'](),
+          credits: m['svgai.pricing.credits'](),
+          processing: m['common.pricing.processing'](),
+          perCredit: m['svgai.pricing.per_credit'](),
+          billingNote: m['svgai.pricing.billing_note'](),
+          billingTitle: m['svgai.pricing.billing_title'](),
+          billingDescription: m['svgai.pricing.billing_description'](),
+          reserve: m['svgai.pricing.reserve']({
+            credits: SVG_RESERVED_CREDITS,
+          }),
+          refund: m['svgai.pricing.refund'](),
+          features: [
+            m['svgai.pricing.feature_generation'](),
+            m['svgai.pricing.feature_export'](),
+            m['svgai.pricing.feature_edit'](),
+            m['svgai.pricing.feature_image'](),
+          ],
+          faqTitle: m['svgai.pricing.faq_title'](),
+          faqs: [
+            {
+              question: m['svgai.pricing.faq_cost_q'](),
+              answer: m['svgai.pricing.faq_cost_a'](),
+            },
+            {
+              question: m['svgai.pricing.faq_expiry_q'](),
+              answer: m['svgai.pricing.faq_expiry_a'](),
+            },
+            {
+              question: m['svgai.pricing.faq_cancel_q'](),
+              answer: m['svgai.pricing.faq_cancel_a'](),
+            },
+            {
+              question: m['svgai.pricing.faq_fail_q'](),
+              answer: m['svgai.pricing.faq_fail_a'](),
+            },
+          ],
+        }}
+      />
       <PaymentProviderModal
         open={modalOpen}
-        onOpenChange={(open) => {
-          setModalOpen(open);
-          if (!open) {
-            setPendingPlan(null);
-            setLoadingProvider(null);
-          }
-        }}
-        providers={enabledProviders.length ? enabledProviders : ['stripe']}
+        onOpenChange={setModalOpen}
+        providers={enabledProviders}
         loadingProvider={loadingProvider}
-        onSelect={handleProviderSelect}
-        planName={pendingPlan?.name}
-        price={pendingPlan?.price}
+        onSelect={(provider) => {
+          if (pendingId) start(pendingId, provider);
+        }}
+        planName={pendingId ? pricingCatalog[pendingId].planName : undefined}
       />
-    </section>
+    </>
   );
 }

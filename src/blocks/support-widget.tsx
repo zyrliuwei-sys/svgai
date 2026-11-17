@@ -153,6 +153,7 @@ export function SupportWidget() {
                   {m['common.support.track_hint_prefix']()}{' '}
                   <Link
                     href="/settings/tickets"
+                    onClick={() => setOpen(false)}
                     className="hover:text-foreground underline"
                   >
                     {m['common.support.track_hint_link']()}

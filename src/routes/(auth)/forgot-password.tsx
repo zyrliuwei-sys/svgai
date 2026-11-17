@@ -9,6 +9,8 @@ import { envConfigs } from '@/config';
 import { m } from '@/paraglide/messages.js';
 import { localizeHref } from '@/paraglide/runtime.js';
 import { usePublicConfig } from '@/hooks/use-public-config';
+import { AuthBrand } from '@/blocks/auth-brand';
+import { AuthHelp } from '@/blocks/auth-help';
 import { TextField } from '@/components/form-field';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,7 +23,7 @@ import {
 import { Field, FieldDescription, FieldGroup } from '@/components/ui/field';
 
 const forgotSchema = z.object({
-  email: z.string().email(m['common.sign.email_placeholder']()),
+  email: z.string().email(m['common.sign.email_invalid']()),
 });
 
 function ForgotPasswordPage() {
@@ -60,17 +62,20 @@ function ForgotPasswordPage() {
   });
 
   return (
-    <div className="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="self-center font-serif text-lg italic">
+    <div className="svgai-page svg-auth-shell">
+      <AuthBrand />
+      <div className="svg-auth-form flex w-full max-w-sm flex-col gap-6">
+        <Link href="/" className="svg-auth-form-brand">
           {configs.app_name || envConfigs.app_name}
         </Link>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">
-              {sent
-                ? m['common.sign.reset_link_sent_title']()
-                : m['common.sign.forgot_password_title']()}
+              <h1>
+                {sent
+                  ? m['common.sign.reset_link_sent_title']()
+                  : m['common.sign.forgot_password_title']()}
+              </h1>
             </CardTitle>
             {!sent && (
               <CardDescription>
@@ -162,11 +167,13 @@ function ForgotPasswordPage() {
             )}
           </CardContent>
         </Card>
+        <AuthHelp />
       </div>
     </div>
   );
 }
 
 export const Route = createFileRoute('/(auth)/forgot-password')({
+  head: () => ({ meta: [{ title: m['common.sign.forgot_password_title']() }] }),
   component: ForgotPasswordPage,
 });

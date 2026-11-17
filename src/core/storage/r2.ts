@@ -122,9 +122,11 @@ export class R2Provider implements StorageProvider {
       const headers: Record<string, string> = {
         'Content-Type': options.contentType || 'application/octet-stream',
         'Content-Disposition': options.disposition || 'inline',
-        'Content-Length': bodyArray.length.toString(),
       };
 
+      // Fetch derives the length from this fixed-size body. An explicit
+      // Content-Length is rejected by Node's fetch with Wrangler's proxy
+      // dispatcher, before the upload ever reaches R2.
       const request = new Request(url, {
         method: 'PUT',
         headers,

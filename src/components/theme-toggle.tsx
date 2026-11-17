@@ -7,7 +7,7 @@ import { useAppearance } from '@/hooks/use-appearance';
 import { Button } from '@/components/ui/button';
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme();
+  const { resolvedTheme, setTheme } = useTheme();
   // The admin fixed light/dark for everyone.
   const { colorModeForced } = useAppearance();
   if (colorModeForced) return null;
@@ -16,7 +16,7 @@ export function ThemeToggle() {
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
     >
       <Sun className="size-4 dark:hidden" />
       <Moon className="hidden size-4 dark:block" />

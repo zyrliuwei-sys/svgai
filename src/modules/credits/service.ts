@@ -427,3 +427,75 @@ export async function getHistory(userId: string, limit = 50) {
     .orderBy(desc(credit.createdAt))
     .limit(limit);
 }
+
+/** Plan a partial release of an AI reservation. Bundle with the task's settlement guard. */
+export async function planReleaseReservation(
+  consumeCreditId: string,
+  amount: number
+) {
+  const [record] = (await db()
+    .select()
+    .from(credit)
+    .where(
+      and(
+        eq(credit.id, consumeCreditId),
+        eq(credit.transactionType, CreditTransactionType.CONSUME),
+        eq(credit.status, CreditStatus.ACTIVE)
+      )
+    )
+    .limit(1)) as (typeof credit.$inferSelect)[];
+  if (
+    !record ||
+    !Number.isSafeInteger(amount) ||
+    amount < 0 ||
+    amount > -record.credits
+  )
+    throw new Error('Invalid credit reservation');
+  const items = JSON.parse(record.consumedDetail || '[]') as {
+    creditId: string;
+    creditsConsumed: number;
+    [key: string]: unknown;
+  }[];
+  let release = amount;
+  const restores: { id: string; amount: number }[] = [];
+  const kept = items
+    .map((item) => {
+      const restored = Math.min(item.creditsConsumed, release);
+      release -= restored;
+      if (restored) restores.push({ id: item.creditId, amount: restored });
+      return { ...item, creditsConsumed: item.creditsConsumed - restored };
+    })
+    .filter((item) => item.creditsConsumed > 0);
+  if (release !== 0) throw new Error('Invalid reservation detail');
+  return (q: any): AtomicStep[] => [
+    guard({
+      table: credit,
+      column: 'userId',
+      where: eq(credit.id, consumeCreditId),
+      require: and(
+        eq(credit.status, CreditStatus.ACTIVE),
+        eq(credit.credits, record.credits)
+      )!,
+      message: 'Reservation already settled',
+    }),
+    ...restores.map((item) =>
+      q
+        .update(credit)
+        .set({
+          remainingCredits: sql`${credit.remainingCredits} + ${item.amount}`,
+        })
+        .where(eq(credit.id, item.id))
+    ),
+    q
+      .update(credit)
+      .set({
+        credits: record.credits + amount,
+        consumedDetail: JSON.stringify(kept),
+        status:
+          record.credits + amount === 0
+            ? CreditStatus.DELETED
+            : CreditStatus.ACTIVE,
+      })
+      .where(eq(credit.id, consumeCreditId)),
+  ];
+}

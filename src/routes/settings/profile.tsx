@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 
+import { envConfigs } from '@/config';
 import { apiGet } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 
@@ -37,5 +38,10 @@ function SettingsPage() {
 }
 
 export const Route = createFileRoute('/settings/profile')({
+  head: () => ({
+    meta: [
+      { title: m['settings.profile.title']() + ' | ' + envConfigs.app_name },
+    ],
+  }),
   component: SettingsPage,
 });

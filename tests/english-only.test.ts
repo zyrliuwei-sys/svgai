@@ -61,6 +61,21 @@ test('old auth and payment return targets stay English and cannot turn into exte
   );
   assert.equal(safeInternalPath('/zh/sign-in'), null);
   assert.equal(safeInternalPath('//foreign.example/path'), null);
+  for (const target of [
+    '/\\foreign.example/path',
+    '/\t/foreign.example/path',
+    '/\n/foreign.example/path',
+    '/a/../sign-in',
+    '/a/../zh/sign-up',
+    'javascript:alert(1)',
+    'https://foreign.example/path',
+  ]) {
+    assert.equal(safeInternalPath(target), null, target);
+  }
+  assert.equal(
+    safeInternalPath('/a/../settings?tab=billing#details'),
+    '/settings?tab=billing#details'
+  );
   assert.equal(localizedPath('/settings/billing', 'zh'), '/settings/billing');
 });
 
@@ -80,4 +95,23 @@ test('a stale Chinese cookie and Chinese browser preference still render English
     }
   );
   assert.equal(await response.text(), 'Profile');
+});
+
+test('authentication preserves the chosen SVG plan and generator anchor without accepting an auth-page loop', () => {
+  const selectedPlan = '/pricing?plan=pro_monthly#pricing';
+  assert.equal(safeInternalPath(selectedPlan), selectedPlan);
+  assert.equal(
+    resolveAfterAuthUrl({ callbackUrl: selectedPlan }),
+    selectedPlan
+  );
+  assert.equal(
+    resolveAfterAuthUrl({ callbackUrl: '/text-to-svg#generator' }),
+    '/text-to-svg#generator'
+  );
+  assert.equal(
+    safeInternalPath('/verify-email?callbackUrl=//foreign.example'),
+    null
+  );
+  assert.equal(safeInternalPath('//foreign.example'), null);
+  assert.equal(safeInternalPath('/\\foreign.example'), null);
 });

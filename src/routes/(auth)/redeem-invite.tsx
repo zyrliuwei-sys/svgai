@@ -110,7 +110,7 @@ function RedeemInvitePage() {
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">
-              {m['common.sign.redeem_title']()}
+              <h1>{m['common.sign.redeem_title']()}</h1>
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -160,5 +160,6 @@ function RedeemInvitePage() {
 }
 
 export const Route = createFileRoute('/(auth)/redeem-invite')({
+  head: () => ({ meta: [{ title: m['common.sign.redeem_title']() }] }),
   component: RedeemInvitePage,
 });

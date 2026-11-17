@@ -6,8 +6,9 @@ import { toast } from 'sonner';
 import { authClient, useSession } from '@/core/auth/client';
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { safeInternalPath } from '@/lib/redirect';
 import { m } from '@/paraglide/messages.js';
-import { deLocalizeHref, localizeHref } from '@/paraglide/runtime.js';
+import { localizeHref } from '@/paraglide/runtime.js';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -19,22 +20,6 @@ import {
 } from '@/components/ui/card';
 
 const RESEND_COOLDOWN_SECONDS = 60;
-
-function safeDecodeCallbackUrl(raw?: string | null) {
-  if (!raw) return '/';
-  try {
-    const decoded = decodeURIComponent(raw);
-    if (decoded.startsWith('/')) return decoded;
-    return '/';
-  } catch {
-    return '/';
-  }
-}
-
-function stripLocalePrefix(path: string) {
-  if (!path?.startsWith('/')) return '/';
-  return deLocalizeHref(path);
-}
 
 function getCooldownKey(email?: string | null) {
   return `verify-email:lastSentAt:${String(email || '').toLowerCase()}`;
@@ -101,8 +86,7 @@ function VerifyEmailPage() {
   }, [paramsReady, email, callbackUrl, router]);
 
   const nextUrl = useMemo(() => {
-    const decoded = safeDecodeCallbackUrl(callbackUrl);
-    return stripLocalePrefix(decoded);
+    return safeInternalPath(callbackUrl) || '/';
   }, [callbackUrl]);
 
   const signInPath = useMemo(() => {
@@ -237,7 +221,7 @@ function VerifyEmailPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">
-              {m['common.sign.verify_email_page_title']()}
+              <h1>{m['common.sign.verify_email_page_title']()}</h1>
             </CardTitle>
             <CardDescription className="text-xs md:text-sm">
               {m['common.sign.verify_email_page_description']()}
@@ -299,5 +283,8 @@ function VerifyEmailPage() {
 }
 
 export const Route = createFileRoute('/(auth)/verify-email')({
+  head: () => ({
+    meta: [{ title: m['common.sign.verify_email_page_title']() }],
+  }),
   component: VerifyEmailPage,
 });

@@ -80,6 +80,7 @@ export const envConfigs: Record<string, string> = {
   // OPENAI_API_KEY / ANTHROPIC_API_KEY are common ambient vars, and falling back
   // to them would let the admin "Test" silently pass on the machine's own key.
   replicate_api_token: procEnv.REPLICATE_API_TOKEN ?? '',
+  svg_free_preview_daily_limit: procEnv.SVG_FREE_PREVIEW_DAILY_LIMIT ?? '100',
 
   // Locale (public)
   locale: publicEnv('VITE_DEFAULT_LOCALE') ?? 'en',

@@ -1,53 +1,82 @@
 export const meta = {
   title: 'Privacy Policy',
-  description: 'How we collect, use, and protect your personal information.',
-  updated_at: '2026-05-21',
+  description:
+    'How svgai handles your account, text prompts, images, generated SVG files, and support requests at aisvg-generator.com.',
+  updated_at: '2026-11-17',
 };
 
-## Introduction
+## About svgai
 
-We respect your privacy and are committed to protecting your personal data. This Privacy Policy explains how we collect, use, and safeguard your information when you use our service.
+svgai is a website at [aisvg-generator.com](/) that turns text prompts and selected images into editable SVG files you can preview and download. This policy explains how information is handled when you use the website, create an account, generate artwork, purchase credits, or contact us.
 
-## Information We Collect
+For privacy questions or requests, email [support@aisvg-generator.com](mailto:support@aisvg-generator.com).
 
-We collect the following types of information to provide and improve our service:
+## Text Prompts, Images, and SVG Files
 
-1. **Account Information** — Your name, email address, and other details you provide when creating an account.
-2. **Usage Data** — Information about how you interact with the service, including features accessed, frequency of use, and interaction patterns.
-3. **Device Information** — Device type, operating system, and browser type, used to optimize compatibility and performance.
-4. **Cookies** — Small data files stored on your device to remember preferences and improve your experience.
-5. **Payment Information** — Billing details handled by trusted third-party payment processors. We do not store full card numbers on our servers.
+### Text to SVG
 
-## How We Use Your Information
+When you generate artwork, your text prompt and generation settings are sent to our servers and an external AI generation provider. We store the prompt, settings, task identifiers, processing status, credit usage, and generated result. Your first preview can be created without registering; that record is associated with an essential visitor session and is linked to your account when you sign in. These records support generation, billing, troubleshooting, and recovery.
 
-We use the data we collect to:
+The provider also processes and may retain prompts, generated files, and task records under its own policies. Its [data-handling policy](https://www.seeapi.com/docs/data-handling/) describes its processing and retention practices. Do not include passwords, API keys, confidential documents, or sensitive personal information in a prompt.
 
-- Provide, maintain, and improve the service.
-- Process transactions and send related confirmations.
-- Send technical notices, security alerts, and support messages.
-- Respond to your questions, feedback, and support requests.
-- Detect, prevent, and address fraud and abuse.
+### Image to SVG
 
-## Data Sharing
+Your browser resizes the PNG, JPG, or WebP image you select, then sends a normalized copy to our servers for vector conversion. The image converter does not send your source image to an AI provider. A temporary image copy may be stored while processing is pending. After successful conversion, we retain the vector result and a raster preview to support recovery and downloads.
 
-We do not sell your personal information. We may share data only in these limited cases:
+Before payment, the browser receives a raster preview rather than the editable SVG source. Access to a saved preview requires the original visitor session or its linked account. Downloading an editable SVG requires a verified paid purchase and any applicable credit charge.
 
-- With service providers who help us operate the service, under confidentiality agreements.
-- To comply with legal obligations or respond to lawful requests from public authorities.
-- To protect our rights, property, or safety, or that of our users.
+### Free-preview limits
 
-## Data Security
+An essential signed visitor cookie and account records enforce the one-preview allowance. We also use keyed hashes derived from network and browser information to limit repeat claims and abuse; the preview quota records do not store raw IP addresses or raw browser identifiers. Clearing a cookie does not necessarily reset the allowance. Anonymous limits cannot reliably identify the same person across every device or network.
 
-We implement industry-standard security measures including encryption in transit, access controls, and regular reviews. No method of transmission over the Internet is 100% secure, but we work continuously to protect your information.
+### Downloads and Browser Storage
 
-## Your Rights
+When you download an SVG, the file is saved through your browser to the location you choose. We do not have access to your local download folder.
 
-You have the right to access, update, export, or delete your personal information. You can do this through your account settings or by contacting us at the email address below.
+We use browser storage to remember preferences and save the request identifier, prompt, settings, and task identifier needed to resume a pending text generation or recover the latest result. These saved details may remain in that browser until they are replaced or you clear the site's storage. On a shared device, sign out and clear site data when appropriate.
 
-## Changes to This Policy
+## Other Information We Handle
 
-We may update this Privacy Policy from time to time. We will notify you of any material changes by updating the date at the top of this page and, where appropriate, sending a notice through the service.
+- **Account information:** your name, email address, authentication records, and profile details you choose to provide. If an external sign-in option is offered and you use it, we receive the account information needed to sign you in.
+- **Billing and credit records:** selected products, order and subscription identifiers, payment status, purchased credits, and credit usage. Payment processors handle payment details; svgai does not store full payment card numbers.
+- **Technical and usage information:** information available when you interact with the website, such as IP address, browser and device details, request times, referring pages, errors, and product events. The information collected depends on the feature and analytics tools in use.
+- **Support communications:** your email address, message, relevant account or order details, and any materials you choose to send us.
 
-## Contact Us
+## Why We Use Information
 
-If you have questions about this Privacy Policy, please contact us at the email address provided on our website.
+We use information to operate your account, generate and deliver SVG files, maintain task progress, calculate credits, process purchases, manage subscriptions, respond to support requests, understand website performance, and investigate errors or abuse. We also keep records needed for security, accounting, and applicable legal obligations.
+
+## Service Providers and Other Disclosures
+
+We share information with providers where needed to operate the service. These may include hosting and database providers, the AI generation provider for text requests, payment processors for purchases, email providers for account communications, and analytics providers where those tools are enabled.
+
+We may disclose information when required by applicable law, to respond to a lawful request, or to investigate fraud, protect the service, and address threats to users or others. We do not sell the prompts or images you submit as part of providing the SVG generation service.
+
+Service providers may process information in countries other than the one where you live. Their own policies may also apply to information they process, particularly when you use an external sign-in or payment service.
+
+## Cookies and Similar Technologies
+
+Cookies and browser storage support sign-in, account security, display preferences, and saved generation tasks. Analytics tools, where enabled, may use cookies or similar technologies to measure traffic and product usage.
+
+Where the website displays a cookie consent control, use it to manage the choices offered. You can also manage cookies and site storage in your browser. Blocking or clearing essential storage may sign you out, reset preferences, or remove the browser's shortcut to a saved task. Clearing browser storage does not delete account or generation records held on our servers or by service providers.
+
+## Retention and Deletion
+
+We retain account, generation, billing, and support records for the purposes described in this policy, including providing the service, resolving disputes, and meeting applicable recordkeeping requirements. We do not promise that prompts or generated files are automatically deleted immediately after download. Provider-held records follow the provider's own retention practices.
+
+To request account closure or deletion of information, contact [support@aisvg-generator.com](mailto:support@aisvg-generator.com). Include your account email and the relevant task or order identifiers, if available. We may need to verify your identity before acting. Some records may need to be retained for legal, billing, fraud-prevention, or security reasons; removing a task from one system does not automatically remove every provider or backup copy.
+
+## Your Choices and Privacy Requests
+
+You can update the profile details available in your account settings, control browser storage, and choose what you include in prompts and support messages. Depending on applicable law, you may also have rights to request access, correction, deletion, a copy of your information, or limits on certain processing. Send requests to [support@aisvg-generator.com](mailto:support@aisvg-generator.com).
+
+## Security
+
+We use access controls and other technical measures designed to protect account and service information. No internet service or storage system can guarantee absolute security. Keep your account credentials private and contact us if you suspect unauthorized access. Never include your password or API keys in a support request.
+
+## Updates and Contact
+
+We may update this policy as svgai changes. The date at the top identifies the latest version, and we will provide additional notice of material changes where appropriate or required.
+
+Website: [https://aisvg-generator.com](/)<br />
+Support and privacy contact: [support@aisvg-generator.com](mailto:support@aisvg-generator.com)

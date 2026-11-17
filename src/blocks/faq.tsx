@@ -1,44 +1,46 @@
-import { tDynamic } from '@/core/i18n/dynamic';
-import { m } from '@/paraglide/messages.js';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
+import { Plus } from 'lucide-react';
 
-const FAQ_KEYS = [
-  'stack',
-  'payment',
-  'database',
-  'customize',
-  'license',
-] as const;
+import { m } from '@/paraglide/messages.js';
 
 export function FAQ() {
+  const items = [
+    {
+      question: m['svgai.marketing.faq_input_question'](),
+      answer: m['svgai.marketing.faq_input_answer'](),
+    },
+    {
+      question: m['svgai.marketing.faq_paths_question'](),
+      answer: m['svgai.marketing.faq_paths_answer'](),
+    },
+    {
+      question: m['svgai.marketing.faq_formats_question'](),
+      answer: m['svgai.marketing.faq_formats_answer'](),
+    },
+    {
+      question: m['svgai.marketing.faq_privacy_question'](),
+      answer: m['svgai.marketing.faq_privacy_answer'](),
+    },
+    {
+      question: m['svgai.marketing.faq_tools_question'](),
+      answer: m['svgai.marketing.faq_tools_answer'](),
+    },
+  ];
   return (
-    <section id="faq" className="px-4 py-24 sm:py-32">
-      <div className="mx-auto max-w-3xl">
-        <div className="mb-16 text-center">
-          <h2 className="font-serif text-4xl font-medium tracking-tight sm:text-5xl">
-            {m['landing.faq.title']()}
-          </h2>
-          <p className="text-muted-foreground mt-5">
-            {m['landing.faq.description']()}
-          </p>
-        </div>
-        <Accordion className="w-full">
-          {FAQ_KEYS.map((key) => (
-            <AccordionItem key={key} value={key}>
-              <AccordionTrigger className="cursor-pointer py-6 text-left text-base font-medium hover:no-underline">
-                {tDynamic(`landing.faq.${key}.question`)}
-              </AccordionTrigger>
-              <AccordionContent className="text-muted-foreground pb-6 leading-relaxed">
-                {tDynamic(`landing.faq.${key}.answer`)}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+    <section id="faq" className="svgai-container svgai-faq">
+      <div className="svgai-section-intro">
+        <h2>{m['svgai.marketing.faq_title']()}</h2>
+        <p>{m['svgai.marketing.faq_description']()}</p>
+      </div>
+      <div className="svgai-faq-items">
+        {items.map((item) => (
+          <details key={item.question} className="svgai-faq-item">
+            <summary>
+              <span>{item.question}</span>
+              <Plus size={18} strokeWidth={1.4} aria-hidden="true" />
+            </summary>
+            <p>{item.answer}</p>
+          </details>
+        ))}
       </div>
     </section>
   );

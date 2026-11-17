@@ -9,6 +9,7 @@ import {
   sanitizeUtm,
 } from './lib/cookie';
 import { redirectChineseEdition } from './lib/english-only';
+import { isSameOriginRequest, secureResponse } from './lib/request-security';
 import { paraglideMiddleware } from './paraglide/server.js';
 
 // On Cloudflare Workers, stash the binding env (D1, ASSETS, …) on globalThis
@@ -90,8 +91,26 @@ function withMutableHeaders(response: Response): Response {
 // so getLocale() resolves per-request (AsyncLocalStorage) during SSR.
 export default {
   async fetch(req: Request): Promise<Response> {
+    const pathname = new URL(req.url).pathname;
     const redirect = redirectChineseEdition(req);
-    if (redirect) return withMutableHeaders(redirect);
+    if (redirect) return secureResponse(redirect, pathname);
+    // Auth owns OAuth/trusted-origin validation. Provider notifications are
+    // authenticated by signatures and do not rely on browser cookies.
+    if (
+      pathname.startsWith('/api/') &&
+      !pathname.startsWith('/api/auth/') &&
+      !pathname.startsWith('/api/payment/notify/') &&
+      !['GET', 'HEAD', 'OPTIONS'].includes(req.method) &&
+      req.headers.has('cookie') &&
+      !isSameOriginRequest(req, envConfigs.app_url)
+    )
+      return secureResponse(
+        Response.json(
+          { code: -1, message: 'Same-origin request required' },
+          { status: 403 }
+        ),
+        pathname
+      );
     await ensureCloudflareEnv();
     // Wrap the whole request so anything before/after the handler shares
     // the same db client too.
@@ -138,5 +157,5 @@ async function handleRequest(req: Request): Promise<Response> {
       );
     }
   }
-  return response;
+  return secureResponse(response, new URL(req.url).pathname);
 }

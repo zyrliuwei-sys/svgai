@@ -1,5 +1,3 @@
-'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { ChevronRight, type LucideIcon } from 'lucide-react';
 
@@ -19,6 +17,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  useSidebar,
 } from '@/components/ui/sidebar';
 
 export interface NavSubItem {
@@ -59,6 +58,8 @@ export function AppSidebar({
   collapsible?: 'offcanvas' | 'icon';
 }) {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+  const closeMobile = () => setOpenMobile(false);
   // A misconfigured logo URL falls back to the text brand, not a broken image.
   const [logoFailed, setLogoFailed] = useState(false);
   const showLogo = !!logo && !logoFailed;
@@ -161,6 +162,7 @@ export function AppSidebar({
           <SidebarMenuItem>
             <Link
               href={brandHref}
+              onClick={closeMobile}
               className="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left text-sm group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0"
             >
               {showLogo && (
@@ -225,6 +227,7 @@ export function AppSidebar({
                               <SidebarMenuSubItem key={sub.href}>
                                 <SidebarMenuSubButton
                                   render={<Link href={sub.href} />}
+                                  onClick={closeMobile}
                                   isActive={isActiveHref(sub.href)}
                                 >
                                   <span>{sub.label}</span>
@@ -240,15 +243,15 @@ export function AppSidebar({
                   // Plain link.
                   return (
                     <SidebarMenuItem key={item.href}>
-                      <Link href={item.href}>
-                        <SidebarMenuButton
-                          tooltip={item.label}
-                          isActive={isActiveHref(item.href)}
-                        >
-                          <Icon />
-                          <span>{item.label}</span>
-                        </SidebarMenuButton>
-                      </Link>
+                      <SidebarMenuButton
+                        render={<Link href={item.href} />}
+                        tooltip={item.label}
+                        isActive={isActiveHref(item.href)}
+                        onClick={closeMobile}
+                      >
+                        <Icon />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
                     </SidebarMenuItem>
                   );
                 })}
@@ -268,25 +271,27 @@ export function AppSidebar({
                 : item.href === '/'
                   ? pathname === '/'
                   : pathname.startsWith(item.href);
-              const button = (
-                <SidebarMenuButton tooltip={item.label} isActive={isActive}>
-                  <Icon />
-                  <span>{item.label}</span>
-                </SidebarMenuButton>
-              );
               return (
                 <SidebarMenuItem key={item.href}>
-                  {item.newTab ? (
-                    <a
-                      href={localizeHref(item.href)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {button}
-                    </a>
-                  ) : (
-                    <Link href={item.href}>{button}</Link>
-                  )}
+                  <SidebarMenuButton
+                    render={
+                      item.newTab ? (
+                        <a
+                          href={localizeHref(item.href)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        />
+                      ) : (
+                        <Link href={item.href} />
+                      )
+                    }
+                    tooltip={item.label}
+                    isActive={isActive}
+                    onClick={closeMobile}
+                  >
+                    <Icon />
+                    <span>{item.label}</span>
+                  </SidebarMenuButton>
                 </SidebarMenuItem>
               );
             })}

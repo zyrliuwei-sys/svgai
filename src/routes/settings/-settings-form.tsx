@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { useSession } from '@/core/auth/client';
 import { apiPatch } from '@/lib/api-client';
 import { m } from '@/paraglide/messages.js';
 import { TextField } from '@/components/form-field';
@@ -20,7 +21,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 const profileSchema = z.object({
-  name: z.string().min(1),
+  name: z
+    .string()
+    .trim()
+    .min(1, m['common.sign.name_required']())
+    .max(100, m['settings.profile.name_limit']()),
 });
 
 export function SettingsForm({
@@ -34,11 +39,13 @@ export function SettingsForm({
 }) {
   const [image, setImage] = useState(initialImage);
   const queryClient = useQueryClient();
+  const { refetch: refreshSession } = useSession();
 
   const saveMutation = useMutation({
     mutationFn: (values: { name: string; image: string }) =>
       apiPatch('/api/user/profile', values),
-    onSuccess: () => {
+    onSuccess: async () => {
+      await refreshSession();
       toast.success(m['settings.profile.saved']());
       queryClient.invalidateQueries({ queryKey: ['user-info'] });
     },

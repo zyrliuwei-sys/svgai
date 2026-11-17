@@ -13,9 +13,10 @@ import { toast } from 'sonner';
 
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { productPageHead } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
-import { getLocale, localizeUrl } from '@/paraglide/runtime.js';
+import { getLocale } from '@/paraglide/runtime.js';
 import { useGuestPostCheckout } from '@/hooks/use-guest-post-checkout';
 import { formatPrice, guestPostSubmitProblem } from '@/hooks/use-guest-posts';
 import { Footer } from '@/blocks/footer';
@@ -50,7 +51,7 @@ export const Route = createFileRoute('/blog/$slug')({
   },
   head: ({ loaderData }) => {
     if (!loaderData) return {};
-    const { locale, post } = loaderData;
+    const { post } = loaderData;
     if (post.preview) {
       return {
         meta: [
@@ -59,16 +60,12 @@ export const Route = createFileRoute('/blog/$slug')({
         ],
       };
     }
-    const canonical = localizeUrl(`${envConfigs.app_url}/blog/${post.slug}`, {
-      locale: locale as any,
-    }).href;
-    return {
-      meta: [
-        { title: `${post.title} | ${envConfigs.app_name}` },
-        { name: 'description', content: post.description },
-      ],
-      links: [{ rel: 'canonical', href: canonical }],
-    };
+    return productPageHead({
+      path: `/blog/${encodeURIComponent(post.slug)}`,
+      title: `${post.title} | ${envConfigs.app_name}`,
+      description: post.description,
+      article: { publishedAt: post.createdAt, author: post.authorName },
+    });
   },
   component: BlogPostPage,
 });
@@ -209,9 +206,13 @@ function BlogPostPage() {
     post.source === 'local' ? loadLocalPost(post.slug, locale)?.default : null;
 
   return (
-    <div className="bg-background text-foreground flex min-h-screen flex-col">
+    <div className="svgai-page bg-background text-foreground flex min-h-screen flex-col">
       <Header />
-      <main className="flex-1 px-6 py-12 md:px-8 md:py-16">
+      <main
+        id="main-content"
+        tabIndex={-1}
+        className="flex-1 px-6 py-12 md:px-8 md:py-16"
+      >
         {post.preview && (
           <PreviewBanner
             info={post.previewInfo}

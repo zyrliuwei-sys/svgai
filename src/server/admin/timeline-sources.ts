@@ -1,4 +1,7 @@
-import type { SQL } from 'drizzle-orm';
+import { and, eq, type SQL } from 'drizzle-orm';
+
+import { db } from '@/core/db';
+import { svgPreview } from '@/config/db/schema';
 
 /**
  * Plug your own tables into the admin user timeline. Use this when the event
@@ -49,4 +52,28 @@ export interface TimelineSource {
   load: (ctx: TimelineSourceContext) => Promise<TimelineSourceRow[]>;
 }
 
-export const customTimelineSources: TimelineSource[] = [];
+export const customTimelineSources: TimelineSource[] = [
+  {
+    kind: 'svg_preview',
+    load: ({ userId, from, by, limit }) =>
+      db()
+        .select({
+          id: svgPreview.id,
+          at: svgPreview.createdAt,
+          mode: svgPreview.mode,
+          status: svgPreview.status,
+        })
+        .from(svgPreview)
+        .where(and(eq(svgPreview.userId, userId), from(svgPreview.createdAt)))
+        .orderBy(by(svgPreview.createdAt))
+        .limit(limit)
+        .then(
+          (rows: { id: string; at: Date; mode: string; status: string }[]) =>
+            rows.map((row) => ({
+              id: row.id,
+              at: row.at,
+              detail: { mode: row.mode, status: row.status },
+            }))
+        ),
+  },
+];
