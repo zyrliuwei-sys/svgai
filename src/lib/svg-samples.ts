@@ -4,13 +4,10 @@ const artwork = (content: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">${content}</svg>`;
 
 /** Original editable vector studies. These are examples, not AI generations. */
-export const SVG_SAMPLES: SvgSample[] = [
+export const SVG_SAMPLES = [
   {
     id: 'botanical',
-    name: 'Wildflower study',
-    category: 'Botanical illustration',
-    prompt:
-      'A sculptural coral wildflower with flowing sage green leaves, bold organic shapes, mid-century botanical illustration, transparent background',
+    style: 'illustration',
     svg: artwork(`
       <path fill="#476653" d="M247 434c-1-47 4-83 15-121 10-34 18-57 10-91l13-4c9 37 2 64-9 101-10 35-15 72-14 115z"/>
       <path fill="#718C69" d="M254 397c-66 1-110-40-115-105 58 1 104 36 115 105z"/>
@@ -31,10 +28,7 @@ export const SVG_SAMPLES: SvgSample[] = [
   },
   {
     id: 'orbit',
-    name: 'Orbital forms',
-    category: 'Abstract emblem',
-    prompt:
-      'An abstract cobalt blue orbital emblem, intersecting circular forms and a vermilion sun, clean geometric vector design, transparent background',
+    style: 'logo',
     svg: artwork(`
       <path fill="#3155B5" d="M256 78a178 178 0 1 0 0 356 178 178 0 0 0 0-356zm0 35a143 143 0 1 1 0 286 143 143 0 0 1 0-286z" fill-rule="evenodd"/>
       <path fill="#3155B5" d="M256 78c58 0 105 80 105 178s-47 178-105 178-105-80-105-178S198 78 256 78zm0 35c-38 0-70 64-70 143s32 143 70 143 70-64 70-143-32-143-70-143z" fill-rule="evenodd"/>
@@ -49,10 +43,7 @@ export const SVG_SAMPLES: SvgSample[] = [
   },
   {
     id: 'landscape',
-    name: 'Desert daybreak',
-    category: 'Landscape illustration',
-    prompt:
-      'A retro desert landscape with a golden rising sun, layered cobalt mountains and warm terracotta dunes, bold minimal vector poster shapes',
+    style: 'illustration',
     svg: artwork(`
       <path fill="#EBD9AF" d="M100 66h312v380H100z"/>
       <path fill="#E9AB43" d="M294 123a72 72 0 1 1 0 144 72 72 0 0 1 0-144z"/>
@@ -70,10 +61,7 @@ export const SVG_SAMPLES: SvgSample[] = [
   },
   {
     id: 'butterfly',
-    name: 'Papillon',
-    category: 'Nature illustration',
-    prompt:
-      'A symmetrical butterfly with expressive terracotta and cobalt wings, elegant botanical specimen, simple layered vector shapes on a transparent background',
+    style: 'illustration',
     svg: artwork(`
       <path fill="#D97145" d="M248 252C214 123 132 69 86 99c-41 27-7 142 85 180 31 13 59 13 77-27z"/>
       <path fill="#D97145" d="M264 252c34-129 116-183 162-153 41 27 7 142-85 180-31 13-59 13-77-27z"/>
@@ -89,4 +77,203 @@ export const SVG_SAMPLES: SvgSample[] = [
       <path fill="#263C3B" d="M103 117a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm306 0a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm-276 211a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm246 0a6 6 0 1 1 0 12 6 6 0 0 1 0-12z"/>
     `),
   },
-];
+  {
+    id: 'portrait',
+    style: 'line-art',
+    svg: artwork(`
+      <path fill="#E9BA93" d="M316 86a80 80 0 1 1 0 160 80 80 0 0 1 0-160z"/>
+      <path fill="#F6ECDD" d="M126 435c5-63 39-93 94-100l62 1c57 7 94 40 104 99z"/>
+      <path fill="none" stroke="#343F3A" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" d="M143 434c-1-48 24-78 71-91l7-43c-25-19-44-51-44-89 0-65 26-105 79-105 54 0 83 39 83 96 0 43-12 78-43 100l5 41c46 13 70 41 72 91M202 340c11 31 26 45 51 45 24 0 42-16 53-43"/>
+      <path fill="none" stroke="#343F3A" stroke-width="6" stroke-linecap="round" d="M178 214c13-12 23-43 24-63 24 25 54 40 88 40 19 0 34-3 49-10M211 226c10-7 21-7 31 0m32 0c10-7 21-7 31 0"/>
+      <path fill="none" stroke="#343F3A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" d="m260 230-8 30 13 3m-30 17c14 11 29 12 44 0M230 303c17 8 35 8 54 0"/>
+      <path fill="none" stroke="#343F3A" stroke-width="5" stroke-linecap="round" d="M178 229c-26-14-23 25-2 29m161-29c25-14 23 25 1 29M209 403l-9 32m107-32 9 32"/>
+      <path fill="none" stroke="#B07351" stroke-width="5" stroke-linecap="round" d="M116 260v71m-20-53 20 20 18-31M379 293v47m-15-34 15 17 16-27"/>
+      <path fill="#B07351" d="M106 359a6 6 0 1 1 0 12 6 6 0 0 1 0-12zm284-188a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/>
+    `),
+  },
+  {
+    id: 'isometric',
+    style: 'illustration',
+    svg: artwork(`
+      <path fill="#D4DDC9" d="m68 342 187-109 189 109-188 110z"/>
+      <path fill="#F5E9CD" d="m126 208 130-75 130 75-130 76z"/>
+      <path fill="#4C857F" d="m126 208 130 76v135l-130-75z"/>
+      <path fill="#31605E" d="m256 284 130-76v136l-130 75z"/>
+      <path fill="#DB9A68" d="m111 207 143-129 147 128-145 84z"/>
+      <path fill="#F1BE89" d="m111 207 143-129 2 144-130-5z"/>
+      <path fill="#B46A4A" d="m254 78 147 128-145 84v-68z"/>
+      <path fill="#F5E9CD" d="m155 267 32 19v48l-32-19zm55 32 25 14v48l-25-14z"/>
+      <path fill="#E9B86B" d="m280 308 36-21v61l-36 21zm56-32 25-15v33l-25 15z"/>
+      <path fill="#224C4A" d="m164 275 14 8v36l-14-8zm123 40 22-13v40l-22 13z"/>
+      <path fill="#77945D" d="M93 325v-53h12v53zm307-16v-54h12v54z"/>
+      <path fill="#77945D" d="m98 236 28 50H70zm309-17 28 50h-56z"/>
+      <path fill="#A5B77D" d="m98 222 23 43H75zm309-17 23 43h-46z"/>
+      <path fill="#B46A4A" d="m318 121 18-10 14 8v44l-15 9-17-10z"/>
+      <path fill="#F5E9CD" d="m316 120 19-11 18 10-19 11z"/>
+    `),
+  },
+  {
+    id: 'papercut',
+    style: 'illustration',
+    svg: artwork(`
+      <path fill="#E3AD85" d="M85 138c27-58 111-82 174-60 72-22 162 19 172 85 28 70 12 166-42 215-60 64-174 88-251 33C70 363 42 217 85 138z"/>
+      <path fill="#F2D5AC" d="M104 158c27-51 92-71 150-53 63-17 138 17 150 76 24 62 9 139-39 182-56 55-147 73-207 25-57-43-79-158-54-230z"/>
+      <path fill="#A8C6B9" d="M129 172c20-42 77-57 128-38 55-18 112 14 121 66 18 54 2 114-39 152-45 40-116 51-165 12-47-39-69-133-45-192z"/>
+      <path fill="#719F9A" d="M150 191c24-41 64-41 109-25 44-17 87 13 95 55 12 44-3 94-39 124-41 29-90 32-127 1-37-33-54-106-38-155z"/>
+      <path fill="#3C757B" d="M178 213c12-27 48-32 80-17 36-11 65 11 70 42 9 33-5 69-31 90-29 20-64 18-88-7-28-26-43-76-31-108z"/>
+      <path fill="#224F65" d="M204 233c14-21 35-17 54-10 24-5 43 10 44 32 0 27-14 46-32 55-25 11-47-6-57-26-9-17-16-34-9-51z"/>
+      <path fill="#F2D5AC" d="m247 244 16 40-34-12z"/>
+      <path fill="#FFFFFF" d="m247 244 32 29-16 11z"/>
+      <path fill="none" stroke="#A8C6B9" stroke-width="4" stroke-linecap="round" d="m242 302 13 4 12-3m-43-85 8-4 9 1"/>
+    `),
+  },
+  {
+    id: 'bauhaus',
+    style: 'illustration',
+    svg: artwork(`
+      <path fill="#F1E5CC" d="M100 70h312v372H100z"/>
+      <path fill="#244BB0" d="M124 94h126v126H124z"/>
+      <path fill="#D85B39" d="M274 94a114 114 0 0 1 114 114H274z"/>
+      <path fill="#E5AC43" d="M124 244h114v174H124z"/>
+      <path fill="#26372E" d="M124 244h114v57a57 57 0 0 1-114 0z"/>
+      <path fill="#D85B39" d="M267 244h121v121H267z"/>
+      <path fill="#F1E5CC" d="M327 260a44 44 0 1 1 0 88 44 44 0 0 1 0-88z"/>
+      <path fill="#244BB0" d="M267 387h121v31H267z"/>
+      <path fill="#F1E5CC" d="M143 112h13v88h-13zm27 0h13v88h-13zm27 0h13v88h-13zm27 0h9v88h-9z"/>
+      <path fill="#26372E" d="m262 222 11-11 11 11-11 11z"/>
+      <path fill="#E5AC43" d="M340 132a15 15 0 1 1 0 30 15 15 0 0 1 0-30z"/>
+    `),
+  },
+  {
+    id: 'badge',
+    style: 'logo',
+    svg: artwork(`
+      <path fill="#294F43" d="M256 65 298 82 344 82 374 117 416 138 422 185 444 226 429 270 430 317 394 347 373 390 326 396 285 419 241 405 194 405 164 370 121 349 115 302 92 261 107 217 106 170 142 140 163 97 210 91z"/>
+      <path fill="#E7C68B" d="M256 99a157 157 0 1 1 0 314 157 157 0 0 1 0-314z"/>
+      <path fill="#F5E8C8" d="M256 115a141 141 0 1 1 0 282 141 141 0 0 1 0-282z"/>
+      <path fill="#D89550" d="M298 157a38 38 0 1 1 0 76 38 38 0 0 1 0-76z"/>
+      <path fill="#7F9D84" d="m135 298 82-110 71 81 36-38 58 67z"/>
+      <path fill="#294F43" d="m181 298 88-132 101 132z"/>
+      <path fill="#F5E8C8" d="m269 166-33 49 24-7 11 18 13-17 21 4z"/>
+      <path fill="#294F43" d="M144 306h224v9H144zm22 19h180v6H166zm33 17h114v5H199z"/>
+      <path fill="#D89550" d="m256 350 7 14 15 2-11 11 3 15-14-7-14 7 3-15-11-11 15-2z"/>
+      <path fill="#294F43" d="m178 169 5 10 11 2-8 8 2 11-10-5-10 5 2-11-8-8 11-2zm48-35 4 8 9 1-6 7 1 9-8-4-8 4 1-9-6-7 9-1z"/>
+    `),
+  },
+  {
+    id: 'fox',
+    style: 'illustration',
+    svg: artwork(`
+      <path fill="#D97441" d="M153 273c-6 84 34 143 120 143 96 0 155-65 124-123-22-42-80-46-117-8-15-36-31-49-62-52z"/>
+      <path fill="#F0A25B" d="M306 407c79-18 105-79 63-111-17-13-42-11-60 1 37-1 55 18 47 44-7 25-31 44-62 48z"/>
+      <path fill="#F8E7CA" d="M369 296c-17-13-42-11-60 1 17 0 32 6 40 17l23 22c7-17 7-28-3-40z"/>
+      <path fill="#B95232" d="m126 121 61 45 47-13 54 14 67-49-13 117c-8 63-47 106-106 110-65-4-103-46-112-110z"/>
+      <path fill="#E58448" d="m140 138 44 44 51-12 51 12 53-45-17 98c-12 42-42 79-87 89-44-10-76-47-88-89z"/>
+      <path fill="#363E3B" d="m140 138 9 68 30-24zm199-1-14 69-33-24z"/>
+      <path fill="#F8E7CA" d="M147 235c31-10 65 8 88 51 23-43 57-61 87-51-12 42-43 80-87 89-43-9-75-47-88-89z"/>
+      <path fill="#363E3B" d="M219 276q16-9 32 0-6 18-16 18t-16-18z"/>
+      <path fill="none" stroke="#363E3B" stroke-width="6" stroke-linecap="round" d="m174 229 20 5m82 0 20-5m-73 69q12 12 24 0"/>
+      <path fill="#B95232" d="M185 360c13 15 34 22 58 19l-4 20c-24 4-46-5-54-18z"/>
+    `),
+  },
+  {
+    id: 'coffee',
+    style: 'icon',
+    svg: artwork(`
+      <path fill="#D5B394" d="M102 387c0-17 69-31 154-31s154 14 154 31-69 31-154 31-154-14-154-31z"/>
+      <path fill="#244DA3" d="M135 207h206v104c0 51-33 76-103 76s-103-25-103-76z"/>
+      <path fill="none" stroke="#244DA3" stroke-width="25" d="M341 231h23c57 0 57 91 0 91h-23"/>
+      <path fill="#F6E8D0" d="M145 205c0-16 42-29 94-29s94 13 94 29-42 29-94 29-94-13-94-29z"/>
+      <path fill="#8A5039" d="M164 207c0-10 33-18 75-18s75 8 75 18-33 18-75 18-75-8-75-18z"/>
+      <path fill="#F6E8D0" d="M203 205c-18-16-38-10-31 3 7 12 45 14 67 13 22-8 41-18 39-25-4-12-26-3-39 11-10-11-23-16-36-2z"/>
+      <path fill="#7E9DBE" d="M154 248h16v64c0 22 10 36 28 44-31-3-44-18-44-46z"/>
+      <path fill="none" stroke="#8A5039" stroke-width="7" stroke-linecap="round" d="M201 146c-26-24 24-28 0-56m40 55c-26-24 24-28 0-56m40 56c-26-24 24-28 0-56"/>
+      <path fill="#F6E8D0" d="m404 160 6 16 17 6-17 6-6 17-6-17-17-6 17-6z"/>
+      <path fill="#D5B394" d="M102 243a8 8 0 1 1 0 16 8 8 0 0 1 0-16z"/>
+    `),
+  },
+  {
+    id: 'pixel',
+    style: 'icon',
+    svg: artwork(`
+      <path fill="#25366D" d="M128 112h256v32h32v32h32v160h-32v32h-32v32H128v-32H96v-32H64V176h32v-32h32z"/>
+      <path fill="#7198C4" d="M160 144h192v32h32v160h-32v32H160v-32h-32V176h32z"/>
+      <path fill="#A4C4C3" d="M192 144h128v32h-64v32h-64v32h-64v-64h32v-32z"/>
+      <path fill="#456DA6" d="M256 208h64v32h32v32h32v64h-32v32h-96v-32h32v-64h-32z"/>
+      <path fill="#EBAE62" d="M48 256h64v32h64v32h192v-32h64v-32h32v64h-32v32h-64v32H176v-32h-64v-32H48z"/>
+      <path fill="#F7D29C" d="M112 256h64v32h192v-32h64v32h-64v32H176v-32h-64z"/>
+      <path fill="#F7D29C" d="M80 64h16v-16h16v16h16v16h-16v16H96V80H80zm320 16h16V64h16v16h16v16h-16v16h-16V96h-16z"/>
+      <path fill="#D97459" d="M384 400h16v-16h16v16h16v16h-16v16h-16v-16h-16z"/>
+      <path fill="#A4C4C3" d="M64 384h16v16H64zm192-336h16v16h-16zm192 144h16v16h-16z"/>
+    `),
+  },
+  {
+    id: 'origami',
+    style: 'logo',
+    svg: artwork(`
+      <path fill="#315D6B" d="m73 161 167 119-42 45z"/>
+      <path fill="#79ABA5" d="m73 161 179 73-12 46z"/>
+      <path fill="#B4D1BC" d="m128 81 143 162-31 37z"/>
+      <path fill="#F1D7B6" d="m128 81 194 142-51 20z"/>
+      <path fill="#D88165" d="m240 280 82-57 64 98-89 72z"/>
+      <path fill="#EBA38A" d="m271 243 51-20 64 98-74-28z"/>
+      <path fill="#315D6B" d="m240 280 72 13-15 100-99-68z"/>
+      <path fill="#79ABA5" d="m312 293 83-163 25 23-34 168z"/>
+      <path fill="#B4D1BC" d="m395 130 51 30-26-7z"/>
+      <path fill="#315D6B" d="m420 153 26 7-15 10z"/>
+      <path fill="#315D6B" d="m283 384-17 49 40-42zm28-5 7 51 17-65z"/>
+    `),
+  },
+  {
+    id: 'deco',
+    style: 'illustration',
+    svg: artwork(`
+      <path fill="#243C46" d="M103 64h306v384H103z"/>
+      <path fill="none" stroke="#DDB576" stroke-width="5" d="M124 426V213a132 132 0 0 1 264 0v213z"/>
+      <path fill="none" stroke="#DDB576" stroke-width="4" d="M145 426V216a111 111 0 0 1 222 0v210M166 426V220a90 90 0 0 1 180 0v206M187 426V225a69 69 0 0 1 138 0v201"/>
+      <path fill="#DDB576" d="M207 287a49 49 0 0 1 98 0z"/>
+      <path fill="#F3D9AA" d="M236 287a20 20 0 0 1 40 0z"/>
+      <path fill="#DDB576" d="M132 300h248v5H132zm0 18h248v4H132zm0 18h248v3H132z"/>
+      <path fill="#F3D9AA" d="m256 142 8 51h-16zm-57 54 25 34-7 5zm114 0-25 34 7 5z"/>
+      <path fill="none" stroke="#DDB576" stroke-width="4" d="m132 390 41-35 42 35 41-35 41 35 42-35 41 35"/>
+      <path fill="#DDB576" d="m256 396 12 12-12 12-12-12z"/>
+    `),
+  },
+  {
+    id: 'ribbon',
+    style: 'logo',
+    svg: artwork(`
+      <path fill="#263B70" d="M114 130c0-35 28-63 63-63h158c35 0 63 28 63 63v38h-48v-38c0-9-7-16-16-16H178c-9 0-16 7-16 16v38h-48z"/>
+      <path fill="#D66A4B" d="M114 184h48v150c0 9 7 16 16 16h156c9 0 16-7 16-16V184h48v150c0 35-28 63-63 63H177c-35 0-63-28-63-63z"/>
+      <path fill="#F1BB83" d="M184 114h48v220c0 9 7 16 16 16h16c9 0 16-7 16-16V114h48v220c0 35-28 63-63 63h-18c-35 0-63-28-63-63z"/>
+      <path fill="#263B70" d="M184 184h48v48h-48zm96 96h48v48h-48z"/>
+      <path fill="#F4E9D3" d="M114 168h48v16h-48zm236 0h48v16h-48zm-118 64h48v16h-48zm-48 32h48v16h-48zm96 0h48v16h-48z"/>
+      <path fill="#D66A4B" d="M162 184h188v48H162z"/>
+      <path fill="#263B70" d="M162 280h188v48H162z"/>
+      <path fill="#F1BB83" d="M184 184h48v48h-48zm96 96h48v48h-48z"/>
+      <path fill="#D66A4B" d="M239 421h34v12h-34z"/>
+    `),
+  },
+  {
+    id: 'koi',
+    style: 'illustration',
+    svg: artwork(`
+      <path fill="none" stroke="#B2C1B5" stroke-width="4" stroke-linecap="round" d="M111 183c-35 59-19 142 24 184m235-240c44 50 48 130 19 186M95 223c-12 53 2 105 29 136m268-197c24 40 23 96 10 125"/>
+      <path fill="#D76543" d="M269 92c-68-3-126 41-141 99-18 69 17 119 79 119 45 0 68-42 48-70-17-24-48-22-54-45-8-31 15-53 68-103z"/>
+      <path fill="#F1B77E" d="M269 92c-29 34-67 71-68 101-28-8-44-3-68 11 12-61 64-105 136-112z"/>
+      <path fill="#F6E7CB" d="M151 227c23-13 46-15 67-4l-13 22-36 21z"/>
+      <path fill="#253F43" d="M191 280a7 7 0 1 1 0 14 7 7 0 0 1 0-14z"/>
+      <path fill="#D76543" d="m255 112 36-40 13 57-25-3 7 30z"/>
+      <path fill="#F1B77E" d="m137 185-39-5 25 38 15-9z"/>
+      <path fill="#253F43" d="M243 420c68 3 126-41 141-99 18-69-17-119-79-119-45 0-68 42-48 70 17 24 48 22 54 45 8 31-15 53-68 103z"/>
+      <path fill="#719B98" d="M243 420c29-34 67-71 68-101 28 8 44 3 68-11-12 61-64 105-136 112z"/>
+      <path fill="#F6E7CB" d="M361 285c-23 13-46 15-67 4l13-22 36-21z"/>
+      <path fill="#F1B77E" d="M321 218a7 7 0 1 1 0 14 7 7 0 0 1 0-14z"/>
+      <path fill="#253F43" d="m257 400-36 40-13-57 25 3-7-30z"/>
+      <path fill="#719B98" d="m375 327 39 5-25-38-15 9z"/>
+      <path fill="#D76543" d="M340 132a7 7 0 1 1 0 14 7 7 0 0 1 0-14zm-173 236a5 5 0 1 1 0 10 5 5 0 0 1 0-10z"/>
+    `),
+  },
+] as const satisfies readonly Pick<SvgSample, 'id' | 'svg' | 'style'>[];
+
+export type SvgSampleId = (typeof SVG_SAMPLES)[number]['id'];

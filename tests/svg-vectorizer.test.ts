@@ -15,8 +15,11 @@ const square =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80"><path fill="#f80" d="M0 0h120v80H0z"/></svg>';
 
 test('samples are real bounded vector artwork and can be exported on SSR', () => {
-  assert.equal(SVG_SAMPLES.length, 4);
-  assert.equal(new Set(SVG_SAMPLES.map((sample) => sample.id)).size, 4);
+  assert.equal(SVG_SAMPLES.length, 16);
+  assert.equal(
+    new Set(SVG_SAMPLES.map((sample) => sample.id)).size,
+    SVG_SAMPLES.length
+  );
   for (const sample of SVG_SAMPLES) {
     const stats = getSvgStats(sample.svg);
     assert.ok(stats.paths >= 8 && stats.paths <= 25, sample.id);

@@ -20,7 +20,7 @@ import {
   visitorPreview,
   type Preview,
 } from '@/modules/svg-previews/service';
-import { getSvgStats, sanitizeSvg } from '@/lib/svg-vectorizer';
+import { getSvgStats, outlineSvg, sanitizeSvg } from '@/lib/svg-vectorizer';
 import { svgVisitor } from '@/lib/svg-visitor';
 
 import { providerPrompt } from './svg-generation';
@@ -60,6 +60,27 @@ export function publicPreview(row: Preview) {
       : {}),
   };
 }
+
+/** Raster-only comparison views for the preview already scoped to this viewer. */
+export async function renderPreviewAsset(
+  row: Preview | undefined,
+  assetId: string,
+  outline = false
+): Promise<Uint8Array> {
+  if (
+    !row ||
+    row.id !== assetId ||
+    row.status !== 'succeeded' ||
+    !row.previewPng ||
+    (outline && !row.svg)
+  )
+    throw new PreviewError('not_found');
+  const png = outline
+    ? await rasterizeSvg(outlineSvg(row.svg!))
+    : row.previewPng;
+  return new Uint8Array(Buffer.from(png, 'base64'));
+}
+
 export async function refreshPreview(row: Preview) {
   if (['succeeded', 'failed'].includes(row.status)) return row;
   const input = JSON.parse(row.options);

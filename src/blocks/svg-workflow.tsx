@@ -1,4 +1,3 @@
-import type { SvgSample } from '@/types/svg-generator';
 import {
   ArrowRight,
   Download,
@@ -29,8 +28,7 @@ export function SvgWorkflow() {
     },
   ];
   const artwork =
-    SVG_SAMPLES.find((sample: SvgSample) => sample.id === 'orbit') ||
-    SVG_SAMPLES[0];
+    SVG_SAMPLES.find((sample) => sample.id === 'orbit') || SVG_SAMPLES[0];
   return (
     <section
       id="how-it-works"

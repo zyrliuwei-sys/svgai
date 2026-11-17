@@ -47,6 +47,10 @@ import {
   svgToDataUrl,
 } from '@/lib/svg-vectorizer';
 import {
+  SvgComparison,
+  type SvgComparisonCopy,
+} from '@/components/svg-comparison';
+import {
   Dialog,
   DialogClose,
   DialogContent,
@@ -62,6 +66,7 @@ interface Props {
   samples: SvgSample[];
   initialMode?: SvgMode;
   formatTrialCredits: (credits: number) => string;
+  comparisonCopy: SvgComparisonCopy;
 }
 
 export function SvgGenerator({
@@ -69,6 +74,7 @@ export function SvgGenerator({
   samples,
   initialMode = 'text',
   formatTrialCredits,
+  comparisonCopy,
 }: Props) {
   const errorId = useId();
   const generatorRef = useRef<HTMLDivElement>(null);
@@ -103,7 +109,8 @@ export function SvgGenerator({
   const [aspect, setAspect] = useState<SvgAspect>('1:1');
   const [svg, setSvg] = useState(initial.svg);
   const [sampleId, setSampleId] = useState<string | null>(initial.id);
-  const [view, setView] = useState<'preview' | 'outline' | 'code'>('preview');
+  const [view, setView] = useState<'preview' | 'code'>('preview');
+  const [comparisonPosition, setComparisonPosition] = useState(50);
   const [file, setFile] = useState<File | null>(null);
   const [imageUrl, setImageUrl] = useState('');
   const [removeBackground, setRemoveBackground] = useState(true);
@@ -577,6 +584,8 @@ export function SvgGenerator({
   const loadSample = (sample: SvgSample) => {
     sampleSelected.current = true;
     form.setFieldValue('prompt', sample.prompt);
+    setStyle(sample.style ?? 'illustration');
+    setAspect('1:1');
     setSvg(sample.svg);
     setTrialPreview(null);
     setSampleId(sample.id);
@@ -733,7 +742,7 @@ export function SvgGenerator({
       void download();
     }
   }, [availability.data?.paid, trialPreview?.status]);
-  const changeView = (next: 'preview' | 'outline' | 'code') => {
+  const changeView = (next: 'preview' | 'code') => {
     if (trialPreview && next !== 'preview') {
       if (!availability.data?.paid) {
         setPaywallOpen(true);
@@ -747,10 +756,15 @@ export function SvgGenerator({
     setView(next);
   };
   const artworkUrl = useMemo(
+    () => trialPreview?.previewUrl || svgToDataUrl(svg),
+    [svg, trialPreview?.previewUrl]
+  );
+  const outlineArtworkUrl = useMemo(
     () =>
-      trialPreview?.previewUrl ||
-      svgToDataUrl(view === 'outline' ? outlineSvg(svg) : svg),
-    [svg, view, trialPreview?.previewUrl]
+      trialPreview?.previewUrl
+        ? `${trialPreview.previewUrl}&view=outline`
+        : svgToDataUrl(outlineSvg(svg)),
+    [svg, trialPreview?.previewUrl]
   );
 
   return (
@@ -1103,7 +1117,7 @@ export function SvgGenerator({
             role="tablist"
             aria-label={copy.output_modes}
           >
-            {(['preview', 'outline', 'code'] as const).map((key) => (
+            {(['preview', 'code'] as const).map((key) => (
               <button
                 type="button"
                 key={key}
@@ -1114,12 +1128,16 @@ export function SvgGenerator({
                 tabIndex={view === key ? 0 : -1}
                 onClick={() => changeView(key)}
                 onKeyDown={(event) => {
-                  const keys = ['preview', 'outline', 'code'] as const;
+                  const keys = ['preview', 'code'] as const;
                   const i = keys.indexOf(view);
                   if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
                     event.preventDefault();
                     const next =
-                      keys[(i + (event.key === 'ArrowRight' ? 1 : 2)) % 3]!;
+                      keys[
+                        (i +
+                          (event.key === 'ArrowRight' ? 1 : keys.length - 1)) %
+                          keys.length
+                      ]!;
                     changeView(next);
                     (
                       event.currentTarget.parentElement?.children[
@@ -1170,14 +1188,16 @@ export function SvgGenerator({
               <div className="svg-artboard-corner corner-tr" />
               <div className="svg-artboard-corner corner-bl" />
               <div className="svg-artboard-corner corner-br" />
-              <img
-                className={`svg-artwork ${view === 'outline' ? 'is-outline' : ''}`}
-                src={artworkUrl}
+              <SvgComparison
+                className="svg-artwork-comparison"
+                colorSrc={artworkUrl}
+                outlineSrc={outlineArtworkUrl}
                 alt={copy.preview_alt}
-                width={stats.width}
-                height={stats.height}
-                decoding="async"
-                style={{ transform: `scale(${zoom})` }}
+                copy={comparisonCopy}
+                value={comparisonPosition}
+                onValueChange={setComparisonPosition}
+                scale={zoom}
+                disabled={generate.isPending}
               />
               {trialPreview?.status === 'succeeded' && (
                 <div className="svg-preview-lock">
@@ -1297,12 +1317,14 @@ export function SvgGenerator({
             </DialogClose>
           </div>
           <div className="svg-expanded-artboard">
-            <img
-              className={view === 'outline' ? 'is-outline' : ''}
-              src={artworkUrl}
+            <SvgComparison
+              className="svg-expanded-comparison"
+              colorSrc={artworkUrl}
+              outlineSrc={outlineArtworkUrl}
               alt={copy.preview_alt}
-              width={stats.width}
-              height={stats.height}
+              copy={comparisonCopy}
+              value={comparisonPosition}
+              onValueChange={setComparisonPosition}
             />
           </div>
           <div className="svg-expanded-footer">

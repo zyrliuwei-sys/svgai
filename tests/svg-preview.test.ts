@@ -67,7 +67,7 @@ const { setAtomicModeForTests } = await import('../src/core/db/atomic');
 setAtomicModeForTests('batch');
 const { parseImageInput, traceImage, rasterizeSvg } =
   await import('../src/server/svg-renderer');
-const { publicPreview, refreshPreview, unlockPreview } =
+const { publicPreview, refreshPreview, unlockPreview, renderPreviewAsset } =
   await import('../src/server/svg-previews');
 const { svgVisitor } = await import('../src/lib/svg-visitor');
 const { saveConfigs } = await import('../src/modules/config/service');
@@ -279,6 +279,42 @@ test('public preview metadata never includes vectors, source options, PNG bytes 
   for (const key of ['svg', 'options', 'previewPng', 'visitorHash', 'userId'])
     assert.equal(key in result, false);
   assert.doesNotMatch(JSON.stringify(result), /<svg|<path/);
+});
+
+test('color and outline previews render together as PNG without unlocking the SVG', async () => {
+  const row = await ready(input());
+  const images = await Promise.all([
+    renderPreviewAsset(row, row.id),
+    renderPreviewAsset(row, row.id, true),
+  ]);
+  for (const image of images) {
+    const png = Buffer.from(image);
+    assert.equal(png.subarray(1, 4).toString(), 'PNG');
+    assert.equal(png.readUInt32BE(16), 512);
+    assert.equal(png.readUInt32BE(20), 512);
+    assert.doesNotMatch(png.toString(), /<svg|<path/);
+  }
+  assert.notDeepEqual(images[0], images[1]);
+  assert.equal((await findPreview(row.id))?.unlockedTaskId, null);
+  assert.equal('svg' in publicPreview(row), false);
+});
+
+test('both preview image variants reject a foreign asset or a missing viewer preview', async () => {
+  const row = await ready(input());
+  const attempts = await Promise.allSettled([
+    renderPreviewAsset(row, 'another-preview'),
+    renderPreviewAsset(row, 'another-preview', true),
+    renderPreviewAsset(undefined, row.id, true),
+    renderPreviewAsset({ ...row, status: 'pending' }, row.id, true),
+  ]);
+  assert.ok(
+    attempts.every(
+      (result) =>
+        result.status === 'rejected' &&
+        result.reason instanceof PreviewError &&
+        result.reason.code === 'not_found'
+    )
+  );
 });
 test('normalized raster tracing and PNG preview rendering stay on the server', async () => {
   const pixels = new Uint8Array(64 * 64 * 4).fill(255);

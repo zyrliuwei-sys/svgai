@@ -1,8 +1,8 @@
 import type { SvgGeneratorCopy, SvgMode } from '@/types/svg-generator';
 import { Sparkles } from 'lucide-react';
 
-import { SVG_SAMPLES } from '@/lib/svg-samples';
 import { m } from '@/paraglide/messages.js';
+import { getSvgSamples } from '@/blocks/svg-sample-content';
 import { SvgGenerator } from '@/components/svg-generator';
 
 export function Hero({
@@ -12,18 +12,7 @@ export function Hero({
   mode?: SvgMode;
   page?: 'home' | 'text' | 'image';
 }) {
-  const names = {
-    botanical: m['svgai.sample.botanical.name'](),
-    orbit: m['svgai.sample.orbit.name'](),
-    landscape: m['svgai.sample.landscape.name'](),
-    butterfly: m['svgai.sample.butterfly.name'](),
-  };
-  const prompts = {
-    botanical: m['svgai.sample.botanical.prompt'](),
-    orbit: m['svgai.sample.orbit.prompt'](),
-    landscape: m['svgai.sample.landscape.prompt'](),
-    butterfly: m['svgai.sample.butterfly.prompt'](),
-  };
+  const samples = getSvgSamples();
   const copy: SvgGeneratorCopy = {
     trial_used: m['svgai.trial.used'](),
     trial_failed: m['svgai.trial.failed'](),
@@ -117,11 +106,6 @@ export function Hero({
     close_preview: m['svgai.generator.close_preview'](),
     expanded_description: m['svgai.generator.expanded_description'](),
   };
-  const samples = SVG_SAMPLES.map((sample) => ({
-    ...sample,
-    name: names[sample.id as keyof typeof names] ?? sample.name,
-    prompt: prompts[sample.id as keyof typeof prompts] ?? sample.prompt,
-  }));
   return (
     <section id="generator" className="svg-hero svgai-container">
       <div className="svg-hero-intro">
@@ -152,6 +136,17 @@ export function Hero({
         </p>
       </div>
       <SvgGenerator
+        comparisonCopy={{
+          color: m['svgai.gallery.color'](),
+          outline: m['svgai.gallery.outline'](),
+          hint: m['svgai.compare.hint'](),
+          label: (title) => m['svgai.compare.label']({ title }),
+          valueText: (percent) =>
+            m['svgai.compare.value']({
+              color: percent,
+              outline: 100 - percent,
+            }),
+        }}
         key={mode}
         copy={copy}
         samples={samples}

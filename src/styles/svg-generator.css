@@ -319,6 +319,28 @@
   object-fit: contain;
   transition: transform 180ms ease;
 }
+.svg-artboard > .svg-artwork-comparison {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  --comparison-image-width: 340px;
+  --comparison-image-height: 340px;
+  --comparison-image-max-width: 75%;
+  --comparison-image-max-height: 340px;
+}
+.svg-artboard
+  :is(
+    .svg-artboard-corner,
+    .svg-artboard-size,
+    .svg-zoom-controls,
+    .svg-preview-lock
+  ) {
+  z-index: 2;
+}
+.svg-artboard-corner,
+.svg-artboard-size {
+  pointer-events: none;
+}
 .svg-artboard-corner {
   width: 10px;
   height: 10px;
@@ -672,6 +694,11 @@
     height: 290px;
     max-height: 290px;
     width: 290px;
+  }
+  .svg-artboard > .svg-artwork-comparison {
+    --comparison-image-width: 290px;
+    --comparison-image-height: 290px;
+    --comparison-image-max-height: 290px;
   }
   .svg-output-bottom {
     flex-wrap: nowrap;

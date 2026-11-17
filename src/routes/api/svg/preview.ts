@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import {
   publicPreview,
   refreshPreview,
+  renderPreviewAsset,
   svgViewer,
 } from '@/server/svg-previews';
 import { parseImageInput } from '@/server/svg-renderer';
@@ -43,9 +44,17 @@ function errorResponse(error: unknown, extra: HeadersInit = headers) {
   });
 }
 async function GET({ request }: { request: Request }) {
+  const params = new URL(request.url).searchParams;
+  const asset = params.get('asset');
+  const outline = Boolean(asset) && params.get('view') === 'outline';
   const limited = enforceMinIntervalRateLimit(request, {
     intervalMs: 500,
-    keyPrefix: 'svg-preview-read',
+    // Both images load together; each bounded view has its own read bucket.
+    keyPrefix: asset
+      ? outline
+        ? 'svg-preview-outline'
+        : 'svg-preview-color'
+      : 'svg-preview-read',
   });
   if (limited) return limited;
   if (request.headers.get('sec-fetch-site') === 'cross-site')
@@ -54,21 +63,21 @@ async function GET({ request }: { request: Request }) {
     const viewer = await svgViewer(request);
     const responseHeaders = new Headers(headers);
     if (viewer.setCookie) responseHeaders.set('set-cookie', viewer.setCookie);
-    const asset = new URL(request.url).searchParams.get('asset');
     if (asset) {
-      if (
-        !viewer.preview ||
-        viewer.preview.id !== asset ||
-        viewer.preview.status !== 'succeeded' ||
-        !viewer.preview.previewPng
-      )
-        throw new PreviewError('not_found');
+      const userLimited =
+        viewer.userId &&
+        enforceMinIntervalRateLimit(request, {
+          intervalMs: 500,
+          keyPrefix: outline
+            ? 'svg-preview-outline-user'
+            : 'svg-preview-color-user',
+          extraKey: viewer.userId,
+        });
+      if (userLimited) return userLimited;
+      const bytes = await renderPreviewAsset(viewer.preview, asset, outline);
       responseHeaders.set('content-type', 'image/png');
       responseHeaders.set('x-content-type-options', 'nosniff');
-      return new Response(
-        new Uint8Array(Buffer.from(viewer.preview.previewPng, 'base64')),
-        { headers: responseHeaders }
-      );
+      return new Response(bytes, { headers: responseHeaders });
     }
     const userLimited =
       viewer.userId &&

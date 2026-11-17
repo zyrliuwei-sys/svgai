@@ -7,6 +7,7 @@ export interface SvgSample {
   prompt: string;
   svg: string;
   category: string;
+  style?: SvgStyle;
 }
 export interface SvgGenerationRequest {
   requestId: string;

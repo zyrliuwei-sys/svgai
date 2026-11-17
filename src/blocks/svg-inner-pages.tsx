@@ -77,10 +77,6 @@ export function ExamplesPage() {
       <Header />
       <main id="main-content" tabIndex={-1}>
         <Breadcrumb label={m['svgai.marketing.nav_examples']()} />
-        <section className="svgai-container svg-inner-intro">
-          <h1>{m['svgai.inner.examples.heading']()}</h1>
-          <p>{m['svgai.inner.examples.subtitle']()}</p>
-        </section>
         <SvgShowcase standalone />
         <p className="svgai-container svg-example-note">
           {m['svgai.inner.examples.note']()}
