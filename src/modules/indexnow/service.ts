@@ -147,7 +147,9 @@ export async function submitUrls(
           'User-Agent': `IndexNowClient (+${siteOrigin()})`,
         },
         body,
-        redirect: 'error',
+        // Workers rejects redirect: 'error' before sending the request. Manual
+        // mode still prevents forwarding the ownership key to a redirect host.
+        redirect: 'manual',
         signal: AbortSignal.timeout(10_000),
       });
       status = response.status;

@@ -246,7 +246,7 @@ test('submission deduplicates URLs, removes fragments, and stops after HTTP 202'
       assert.equal(body.host, 'indexnow.example.com');
       assert.equal(body.keyLocation, `${origin}/${key}.txt`);
       assert.deepEqual(body.urlList, [`${origin}/page`]);
-      assert.equal(options?.redirect, 'error');
+      assert.equal(options?.redirect, 'manual');
       assert.ok(options?.signal);
       return new Response('', { status: 202 });
     }
@@ -274,6 +274,40 @@ test('provider retries are bounded and never expose its response body', async (t
   assert.equal(result.results[0].ok, true);
   assert.equal(fetchMock.mock.callCount(), 3);
   assert.ok(!JSON.stringify(result).includes(key));
+});
+
+test('redirects are not followed and the next fixed endpoint can accept the submission', async (t) => {
+  const endpoints: string[] = [];
+  t.mock.method(
+    globalThis,
+    'fetch',
+    async (url: RequestInfo | URL, options?: RequestInit) => {
+      // Match workerd: unsupported redirect modes throw before any network I/O.
+      if (options?.redirect === 'error') {
+        throw new TypeError('Unsupported redirect mode');
+      }
+      assert.equal(options?.redirect, 'manual');
+      endpoints.push(String(url));
+      return endpoints.length === 1
+        ? new Response(key, {
+            status: 302,
+            headers: { Location: 'https://untrusted.example/collect' },
+          })
+        : new Response('', { status: 202 });
+    }
+  );
+  const result = await submitUrls(key, [origin]);
+  assert.deepEqual(endpoints, [
+    'https://api.indexnow.org/indexnow',
+    'https://www.bing.com/indexnow',
+  ]);
+  assert.deepEqual(
+    result.results[0].attempts.map(({ status }) => status),
+    [302, 202]
+  );
+  assert.equal(result.results[0].ok, true);
+  assert.ok(!JSON.stringify(result).includes(key));
+  assert.ok(!JSON.stringify(result).includes('untrusted.example'));
 });
 
 test('invalid ownership is reported without retrying on other engines', async (t) => {
