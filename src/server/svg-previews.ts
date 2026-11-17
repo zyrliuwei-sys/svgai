@@ -66,7 +66,7 @@ export async function renderPreviewAsset(
   row: Preview | undefined,
   assetId: string,
   outline = false
-): Promise<Uint8Array> {
+): Promise<Uint8Array<ArrayBuffer>> {
   if (
     !row ||
     row.id !== assetId ||

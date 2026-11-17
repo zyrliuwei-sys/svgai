@@ -1,0 +1,24 @@
+{
+  "$schema": "../node_modules/wrangler/config-schema.json",
+  "name": "svgai",
+  "account_id": "d7c3d8fa2229ed65b03fd28fc8659989",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": { "enabled": true },
+  "vars": {
+    "DATABASE_PROVIDER": "d1",
+    "VITE_APP_URL": "https://aisvg-generator.com",
+    "VITE_APP_NAME": "svgai",
+    "SVG_FREE_PREVIEW_DAILY_LIMIT": "100"
+  },
+  "routes": [{ "pattern": "aisvg-generator.com", "custom_domain": true }],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "svgai",
+      "database_id": "359821ff-63dc-414d-b9f9-55b7982269a3",
+      "migrations_dir": "drizzle",
+      "remote": true
+    }
+  ]
+}

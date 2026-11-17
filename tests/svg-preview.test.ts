@@ -295,7 +295,7 @@ test('color and outline previews render together as PNG without unlocking the SV
     assert.doesNotMatch(png.toString(), /<svg|<path/);
   }
   assert.notDeepEqual(images[0], images[1]);
-  assert.equal((await findPreview(row.id))?.unlockedTaskId, null);
+  assert.equal(await findTask('preview_unlock_' + row.id), undefined);
   assert.equal('svg' in publicPreview(row), false);
 });
 
