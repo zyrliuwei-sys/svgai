@@ -18,7 +18,7 @@ pnpm cf:deploy
 
 The optional ignored `.env.production.local` / `.env.production` files can provide local credentials. They are parsed as data, never executed as shell code. `AUTH_SECRET` and `CONFIG_ENCRYPTION_KEY` are runtime Workers secrets and remain stable across deployments. Never commit either value or put it in the public deployment manifest.
 
-For Cloudflare Workers Builds, connect this repository to the existing `svgai` Worker, select `main`, set build command `pnpm cf:build` and deploy command `pnpm exec wrangler deploy`, and leave root directory `/`. Disable non-production branch deployments unless separate databases and secrets have been configured. Pushes to `main` then trigger build and deploy automatically. Local edits must be committed and pushed to GitHub to trigger a cloud build.
+Cloudflare Workers Builds is connected to this repository and the existing `svgai` Worker. Production branch is `main`, build command is `pnpm cf:build`, deploy command is `pnpm exec wrangler deploy`, and root directory is `/`. Preview builds are disabled to keep other branches away from production resources. Node and pnpm versions are pinned in `.node-version` and `package.json`. Local edits must be committed and pushed to GitHub to trigger a cloud build.
 
 The existing D1 database already contains the application schema, configured admin and encrypted provider settings. Application builds do not run destructive `db:push` against production. Future schema changes must be generated and reviewed as migrations before explicitly applying them to D1, following `AGENTS.md`; code-only deployments reuse the current database.
 
