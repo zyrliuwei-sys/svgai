@@ -13,6 +13,7 @@ import { paidSvgOrder } from '@/modules/svg-previews/service';
 import { parseSvgInput, SvgGenerationError } from '@/modules/svg-generator/service';
 import { fulfillSvg, TaskBillingError } from '@/modules/ai-tasks/service';
 import { SVG_IMAGE_CREDITS } from '@/config/generation';
+import { getBalance } from '@/modules/credits/service';
 import {
   ownedSvgTask,
   refreshSvgGeneration,
@@ -69,7 +70,6 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
       websiteUrl: 'https://aisvg-generator.com',
     },
     {
-      maxToolInputElements: 64,
       instructions:
         'VectorMint creates editable SVG vector graphics. All generation tools require a paid VectorMint account and a user API key. Generation consumes account credits. Use a new UUID requestId for each new generation and reuse the same UUID only when retrying that exact request. Text-to-SVG generation is asynchronous; poll get_svg_task using the returned taskId.',
     }
@@ -157,6 +157,8 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
     },
     async ({ requestId, image, colors, removeBackground }) => {
       try {
+        if ((await getBalance(userId)) < SVG_IMAGE_CREDITS)
+          throw new TaskBillingError('insufficient_credits');
         const input = parseImageInput({ image, colors, removeBackground });
         const svg = await traceImage(input);
         const id = 'image_' + (await svgIdentityHash(userId + ':' + requestId));
