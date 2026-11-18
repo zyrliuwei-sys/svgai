@@ -1570,6 +1570,8 @@
   "svgai.marketing.footer_terms": "Terms of service",
   "svgai.marketing.footer_copyright": "All rights reserved.",
   "svgai.marketing.footer_note": "From the first point to the final path.",
+  "svgai.marketing.producthunt_tagline": "From Idea to Editable SVG",
+  "svgai.marketing.producthunt_cta": "Check it out on Product Hunt →",
   "svgai.marketing.nav_text": "Text to SVG",
   "svgai.marketing.nav_image": "Image to SVG",
   "svgai.seo.intro_label": "Text and image, in one vector workspace",

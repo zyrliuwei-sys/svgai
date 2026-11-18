@@ -67,6 +67,14 @@ export function FooterBadgeList({ className }: { className?: string }) {
 
   if (badges.length === 0) return null;
 
+  if (badges.length === 1) {
+    return (
+      <div className={cn('w-full overflow-hidden', className)}>
+        <BadgeRow badges={badges} />
+      </div>
+    );
+  }
+
   const repeat = Math.ceil(MIN_BADGES_PER_LOOP / badges.length);
   const loop = Array.from({ length: repeat }, () => badges).flat();
   const style = {
