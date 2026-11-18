@@ -1,4 +1,9 @@
-import { createMcpHandler, McpServer } from '@modelcontextprotocol/server';
+import {
+  createMcpHandler,
+  hostHeaderValidationResponse,
+  McpServer,
+  originValidationResponse,
+} from '@modelcontextprotocol/server';
 import { z } from 'zod';
 
 import { seeApiCredentials } from '@/core/ai/seeapi-generation';
@@ -56,8 +61,15 @@ function toolError(error: unknown) {
 
 function createSvgMcpServer(userId: string, paidOrderId: string) {
   const server = new McpServer(
-    { name: 'vectormint-svg', title: 'VectorMint AI SVG Generator', version: '1.0.0' },
     {
+      name: 'vectormint-svg',
+      title: 'VectorMint AI SVG Generator',
+      version: '1.0.0',
+      description: 'Paid AI-powered text-to-SVG and image-to-SVG conversion with editable vector paths.',
+      websiteUrl: 'https://aisvg-generator.com',
+    },
+    {
+      maxToolInputElements: 64,
       instructions:
         'VectorMint creates editable SVG vector graphics. All generation tools require a paid VectorMint account and a user API key. Generation consumes account credits. Use a new UUID requestId for each new generation and reuse the same UUID only when retrying that exact request. Text-to-SVG generation is asynchronous; poll get_svg_task using the returned taskId.',
     }
@@ -180,8 +192,20 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
 
 export async function handleSvgMcp(request: Request) {
   try {
+    const hostRejected = hostHeaderValidationResponse(request, [
+      'aisvg-generator.com',
+      'www.aisvg-generator.com',
+    ]);
+    if (hostRejected) return hostRejected;
+
+    const originRejected = originValidationResponse(request, [
+      'aisvg-generator.com',
+      'www.aisvg-generator.com',
+    ]);
+    if (originRejected) return originRejected;
+
     const authorization = request.headers.get('authorization') || '';
-    const match = /^Bearer (\\S+)$/i.exec(authorization);
+    const match = /^Bearer (\S+)$/i.exec(authorization);
     if (!match)
       return new Response(
         JSON.stringify({ error: 'A VectorMint API key is required in the Authorization: Bearer header.' }),
@@ -193,13 +217,6 @@ export async function handleSvgMcp(request: Request) {
             'cache-control': 'no-store',
           },
         }
-      );
-
-    const origin = request.headers.get('origin');
-    if (origin && origin !== new URL(request.url).origin)
-      return Response.json(
-        { error: 'Origin not allowed.' },
-        { status: 403, headers: { 'cache-control': 'no-store' } }
       );
 
     const userId = await apikeys.validate(match[1]);
