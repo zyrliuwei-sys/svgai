@@ -113,7 +113,13 @@ export class StripeProvider implements PaymentProvider {
       }
 
       // create payment session params
-      const sessionParams: Stripe.Checkout.SessionCreateParams = {
+      // Use standard Stripe Checkout for this site's one-time and subscription
+      // sessions without changing the shared Stripe account default.
+      // The pinned Stripe SDK types do not yet include managed_payments.
+      const sessionParams: Stripe.Checkout.SessionCreateParams & {
+        managed_payments: { enabled: boolean };
+      } = {
+        managed_payments: { enabled: false },
         mode:
           order.type === PaymentType.SUBSCRIPTION ? 'subscription' : 'payment',
         line_items: [
