@@ -2,6 +2,7 @@ import { Resvg } from '@cf-wasm/resvg';
 import { convertIndexedToRgb, decode } from 'fast-png';
 import { Unzlib } from 'fflate';
 
+import { imageTraceOptions } from '@/lib/svg-trace-options';
 import {
   getSvgStats,
   inspectRaster,
@@ -163,20 +164,10 @@ export async function traceImage(input: SvgImageInput): Promise<string> {
   // @ts-expect-error ImageTracerJS has no type declarations.
   const imported = await import('imagetracerjs');
   const tracer = imported.default ?? imported;
-  const raw = tracer.imagedataToSVG(pixels, {
-    ltres: 1,
-    qtres: 1,
-    pathomit: 10,
-    colorsampling: 2,
-    numberofcolors: input.colors,
-    colorquantcycles: 3,
-    layering: 0,
-    strokewidth: 0,
-    linefilter: true,
-    roundcoords: 2,
-    viewbox: true,
-    desc: false,
-  });
+  const raw = tracer.imagedataToSVG(
+    pixels,
+    imageTraceOptions(pixels, input.colors)
+  );
   const svg = sanitizeSvg(raw).replace(
     /<path\b(?=[^>]*\bopacity="0(?:\.0+)?")[^>]*\/>/g,
     ''
