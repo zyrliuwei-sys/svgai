@@ -113,7 +113,14 @@ export class StripeProvider implements PaymentProvider {
       }
 
       // create payment session params
-      const sessionParams: Stripe.Checkout.SessionCreateParams = {
+      // Keep QIHU's account-level Managed Payments default unchanged for other
+      // sites, but use standard Stripe Checkout for VectorMint sessions only.
+      // Stripe SDK 18.5 does not yet declare managed_payments in its types, so
+      // extend the request type locally while still sending the API parameter.
+      const sessionParams: Stripe.Checkout.SessionCreateParams & {
+        managed_payments: { enabled: boolean };
+      } = {
+        managed_payments: { enabled: false },
         mode:
           order.type === PaymentType.SUBSCRIPTION ? 'subscription' : 'payment',
         line_items: [
