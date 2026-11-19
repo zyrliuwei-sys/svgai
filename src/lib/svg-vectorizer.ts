@@ -1,3 +1,5 @@
+import { imageTraceOptions } from '@/lib/svg-trace-options';
+
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_IMAGE_PIXELS = 20_000_000;
 const MAX_IMAGE_EDGE = 12_000;
@@ -448,9 +450,11 @@ export function removeEdgeBackground(image: {
   for (let x = 0; x < width; x++) perimeter.push(x, (height - 1) * width + x);
   for (let y = 1; y < height - 1; y++)
     perimeter.push(y * width, y * width + width - 1);
+  let visiblePerimeter = 0;
   for (const pixel of perimeter) {
     const i = pixel * 4;
     if (data[i + 3] < 32) continue;
+    visiblePerimeter++;
     const key =
       ((data[i] >> 4) << 8) | ((data[i + 1] >> 4) << 4) | (data[i + 2] >> 4);
     const value = histogram.get(key) ?? { count: 0, r: 0, g: 0, b: 0 };
@@ -463,7 +467,7 @@ export function removeEdgeBackground(image: {
   const background = [...histogram.values()].sort(
     (a, b) => b.count - a.count
   )[0];
-  if (!background || background.count < perimeter.length * 0.12) return;
+  if (!background || background.count < visiblePerimeter * 0.6) return;
   const rgb = [background.r, background.g, background.b].map(
     (n) => n / background.count
   );
@@ -479,8 +483,35 @@ export function removeEdgeBackground(image: {
       (data[i] - rgb[0]) ** 2 +
       (data[i + 1] - rgb[1]) ** 2 +
       (data[i + 2] - rgb[2]) ** 2;
-    if (data[i + 3] >= 32 && delta > 42 ** 2) return;
-    data[i + 3] = 0;
+    // A broad RGB tolerance eats low-contrast foreground (for example dark
+    // hair on green). Match transparent antialias fringes to a white/black
+    // matte separately, without widening the tolerance for opaque artwork.
+    const coverage = data[i + 3] / 255;
+    let matches = delta <= 16 ** 2;
+    if (!matches && coverage > 0 && coverage < 1) {
+      for (const matte of [0, 255]) {
+        let projection = 0;
+        let magnitude = 0;
+        for (let c = 0; c < 3; c++) {
+          const direction = matte - rgb[c];
+          projection += (data[i + c] - rgb[c]) * direction;
+          magnitude += direction ** 2;
+        }
+        const blend = Math.max(
+          0,
+          Math.min(1 - coverage + 0.05, magnitude ? projection / magnitude : 0)
+        );
+        let residual = 0;
+        for (let c = 0; c < 3; c++)
+          residual += (data[i + c] - (rgb[c] + blend * (matte - rgb[c]))) ** 2;
+        if (residual <= 16 ** 2) {
+          matches = true;
+          break;
+        }
+      }
+    }
+    if (coverage && !matches) return;
+    data.fill(0, i, i + 4);
     queue[tail++] = pixel;
   };
   for (const pixel of perimeter) add(pixel);
@@ -561,27 +592,10 @@ export async function vectorizeImage(
     // @ts-expect-error ImageTracerJS does not publish TypeScript declarations.
     const imported = await import('imagetracerjs');
     const tracer = imported.default ?? imported;
-    const svg: string = tracer.imagedataToSVG(pixels, {
-      ltres: 1,
-      qtres: 1,
-      pathomit: 10,
-      rightangleenhance: true,
-      colorsampling: 2,
-      numberofcolors: Math.min(
-        24,
-        Math.max(2, Math.round(options.colors) || 8)
-      ),
-      mincolorratio: 0,
-      colorquantcycles: 3,
-      layering: 0,
-      strokewidth: 0,
-      linefilter: true,
-      scale: 1,
-      roundcoords: 2,
-      viewbox: true,
-      desc: false,
-      blurradius: 0,
-    });
+    const svg: string = tracer.imagedataToSVG(
+      pixels,
+      imageTraceOptions(pixels, options.colors)
+    );
     const safe = sanitizeSVG(svg).replace(
       /<path\b(?=[^>]*\bopacity="0(?:\.0+)?")[^>]*\/>/g,
       ''
