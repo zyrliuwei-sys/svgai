@@ -716,3 +716,14 @@ Monthly credits expire at the paid period end; one-time credits do not expire.
   Streamed image uploads are capped before multipart parsing, even without a
   `Content-Length` header. Unsafe login return paths now fall back to the account
   page. No database migration is required.
+
+## 2026-11-19 — Standard Stripe Checkout
+
+All Stripe Checkout sessions now explicitly send `managed_payments[enabled]=false`,
+including one-time credit packs, monthly subscriptions and guest-post purchases.
+This overrides any account-level Managed Payments default and prevents Checkout
+from requiring Managed Payments product tax codes. Deploy the updated application
+for the explicit override to take effect; no database or secret changes are required.
+Stripe Dashboard account defaults are separate settings and must be disabled for
+each account if other integrations should also stop inheriting Managed Payments.
+Existing paid transactions and subscriptions are not migrated by this change.

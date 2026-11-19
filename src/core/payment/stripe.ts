@@ -113,7 +113,12 @@ export class StripeProvider implements PaymentProvider {
       }
 
       // create payment session params
-      const sessionParams: Stripe.Checkout.SessionCreateParams = {
+      // Keep standard Checkout for every product, even if the Stripe account
+      // defaults to Managed Payments. Stripe SDK 18 predates this field's types.
+      const sessionParams: Stripe.Checkout.SessionCreateParams & {
+        managed_payments: { enabled: false };
+      } = {
+        managed_payments: { enabled: false },
         mode:
           order.type === PaymentType.SUBSCRIPTION ? 'subscription' : 'payment',
         line_items: [
