@@ -22,28 +22,6 @@ export function Footer() {
               <span>{envConfigs.app_name}</span>
             </Link>
             <p>{m['svgai.marketing.footer_tagline']()}</p>
-            <div className="svgai-producthunt-card">
-              <div className="svgai-producthunt-summary">
-                <img
-                  src="https://ph-files.imgix.net/163592ac-d154-45c8-aa5c-408d75a01fa4.png?auto=compress,format&codec=mozjpeg&cs=strip&fit=crop&h=80&w=80"
-                  alt={envConfigs.app_name}
-                  width={64}
-                  height={64}
-                  loading="lazy"
-                />
-                <div>
-                  <h3>{envConfigs.app_name}</h3>
-                  <p>{m['svgai.marketing.producthunt_tagline']()}</p>
-                </div>
-              </div>
-              <a
-                href="https://www.producthunt.com/products/vectormint?embed=true&utm_source=embed&utm_medium=post_embed"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {m['svgai.marketing.producthunt_cta']()}
-              </a>
-            </div>
           </div>
           <div className="svgai-footer-links">
             <h3>{m['svgai.marketing.footer_product']()}</h3>
