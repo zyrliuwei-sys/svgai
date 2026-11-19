@@ -37,7 +37,7 @@
     "test:atomic": "node --import tsx --test tests/atomic.test.ts",
     "test:atomic:d1": "ATOMIC_D1=1 node --import tsx --test tests/atomic.test.ts",
     "test:atomic:pg": "TSX_TSCONFIG_PATH=tests/tsconfig.pg.json node --import tsx --test tests/atomic.test.ts",
-    "test:svg": "node --import tsx --test tests/svg-generator.test.ts tests/svg-vectorizer.test.ts tests/svg-billing.test.ts tests/svg-preview.test.ts",
+    "test:svg": "node --import tsx --test tests/svg-generator.test.ts tests/svg-vectorizer.test.ts tests/svg-billing.test.ts tests/svg-preview.test.ts tests/svg-workers.test.mjs",
     "test:svg:d1": "ATOMIC_D1=1 node --import tsx --test tests/svg-billing.test.ts tests/svg-preview.test.ts"
   },
   "lint-staged": {

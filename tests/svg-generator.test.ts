@@ -154,7 +154,7 @@ test('OpenAI generation uses the configured model and validates provider output'
   assert.equal(result.svg, validateGeneratedSvg(simple));
   assert.equal(observed.url, 'https://example.test/v1/chat/completions');
   assert.equal(observed.model, 'test-model');
-  assert.equal(observed.redirect, 'error');
+  assert.equal(observed.redirect, 'manual');
   assert.ok(
     observed.messages.some((m: any) => m.content.includes('botanical'))
   );

@@ -46,6 +46,16 @@ exports, permission codes, and behavior that changes for end users.
 
 ---
 
+## 2026-11-19: SVG generation on Cloudflare Workers
+
+Rebuild and redeploy the SVG generator and SeeAPI connection check. Workers
+rejects `redirect: 'error'` before sending a request; provider requests now
+use `manual` and reject non-2xx responses, including redirects. Credentials
+remain restricted to the configured API origin and SVG assets remain
+restricted to the SeeAPI host allow-list. No schema or key changes are needed.
+Existing pending generations can resume with their original idempotency key
+without a second reservation. The portable SeeAPI installer includes the fix.
+
 ## 2026-11-14: SeeAPI credential settings and portable installer
 
 Admin → Settings → AI now includes SeeAPI (`seeapi_base_url`,

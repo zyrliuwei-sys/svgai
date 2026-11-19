@@ -164,7 +164,7 @@ test('connection tests use only authenticated GET /v1/credits and never echo pro
     requests++;
     assert.equal(String(input), 'https://api.seeapi.com/v1/credits');
     assert.equal(init?.method, 'GET');
-    assert.equal(init?.redirect, 'error');
+    assert.equal(init?.redirect, 'manual');
     assert.equal(
       new Headers(init?.headers).get('Authorization'),
       `Bearer ${key}`
@@ -182,7 +182,7 @@ test('connection tests use only authenticated GET /v1/credits and never echo pro
     assert.equal(result.success, true);
     assert.equal(requests, 1);
     assert(!JSON.stringify(result).includes(key));
-    for (const status of [401, 402, 403, 429, 500]) {
+    for (const status of [301, 302, 303, 307, 308, 401, 402, 403, 429, 500]) {
       globalThis.fetch = async () =>
         Response.json({ error: { message: key } }, { status });
       const failed = await runTest('seeapi', {}, { seeapi_api_key: key });

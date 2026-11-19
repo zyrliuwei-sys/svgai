@@ -41,7 +41,9 @@ async function generationRequest(
     }).seeapi_base_url;
     const response = await fetch(`${baseUrl}/v1/generations${path}`, {
       ...init,
-      redirect: 'error',
+      // Workers rejects "error" before sending. Manual also prevents the key
+      // from following a redirect; non-2xx responses are rejected below.
+      redirect: 'manual',
       signal: AbortSignal.timeout(25_000),
       headers: {
         'Content-Type': 'application/json',
@@ -155,10 +157,13 @@ export async function downloadSeeApiSvg(url: string): Promise<string> {
   )
     throw new SeeApiError();
   const response = await fetch(parsed.href, {
-    redirect: 'error',
+    redirect: 'manual',
     signal: AbortSignal.timeout(20_000),
   });
-  if (!response.ok || !response.body) throw new SeeApiError();
+  if (!response.ok || !response.body) {
+    await response.body?.cancel();
+    throw new SeeApiError();
+  }
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
   let bytes = 0;

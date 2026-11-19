@@ -366,7 +366,7 @@ export async function generateSvg(
   try {
     const response = await fetch(endpoint(provider), {
       method: 'POST',
-      redirect: 'error',
+      redirect: 'manual',
       signal: AbortSignal.timeout(45_000),
       headers: {
         'Content-Type': 'application/json',
