@@ -2,6 +2,11 @@
 
 This is a **headless SaaS engine** — pre-wired business logic (payments, credits, subscriptions, auth, RBAC) with minimal UI. Users build their product pages on top of it.
 
+## Git workflow
+
+Make changes directly on `main` in the primary working directory. Create a
+separate branch or linked worktree only if the user explicitly asks for one.
+
 ## Product copy
 
 Use the configured application name for branding. Do not add upstream vendor
