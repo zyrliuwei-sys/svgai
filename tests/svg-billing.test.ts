@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
 import { and, eq } from 'drizzle-orm';
+import { encode } from 'fast-png';
 
 import { generationCredits } from '../src/config/generation';
 import { pricingCatalog } from '../src/config/pricing';
@@ -14,6 +15,7 @@ Object.assign(process.env, {
   DATABASE_PROVIDER: 'sqlite',
   DATABASE_URL: `file:${directory}/test.db`,
   AUTH_SECRET: 'isolated-test-secret-for-svg-billing',
+  VITE_APP_URL: 'https://svg.example.test',
   NODE_ENV: 'test',
 });
 execFileSync(
@@ -50,7 +52,7 @@ if (process.env.ATOMIC_D1 === '1') {
   disposeD1 = proxy.dispose;
 }
 const { db } = await import('../src/core/db');
-const { aiTask, credit, user } = await import('../src/config/db/schema');
+const { aiTask, credit, order, user } = await import('../src/config/db/schema');
 const { getBalance, grant } = await import('../src/modules/credits/service');
 const { reserveGeneration, settleGeneration, findTask } =
   await import('../src/modules/ai-tasks/service');
@@ -244,8 +246,13 @@ test('refunded reservation restores original grant expiration rather than creati
   assert.equal(record.expiresAt?.getTime(), source.expiresAt?.getTime());
 });
 
-const { startSvgGeneration, refreshSvgGeneration, ownedSvgTask } =
-  await import('../src/server/svg-generation');
+const {
+  startSvgGeneration,
+  startSvgImageEdit,
+  refreshSvgGeneration,
+  ownedSvgTask,
+} = await import('../src/server/svg-generation');
+const { serveImageSource } = await import('../src/server/svg-image-source');
 const { seeApiCredentials, createSeeApiGeneration } =
   await import('../src/core/ai/seeapi-generation');
 const realFetch = globalThis.fetch;
@@ -260,6 +267,138 @@ const requestInput = {
 } as const;
 const validSvg =
   '<svg viewBox="0 0 100 100"><title>A flower</title><path fill="#f00" d="M0 0L50 0L20 30Z"/></svg>';
+
+test('AI image conversion signs its input, traces the SeeAPI result and charges once', async () => {
+  const { userId } = await fixture();
+  const paidOrderId = 'paid-' + userId;
+  await db().insert(order).values({
+    id: paidOrderId,
+    orderNo: paidOrderId,
+    userId,
+    status: 'paid',
+    amount: 700,
+    currency: 'usd',
+    productId: 'starter_monthly',
+    paymentProvider: 'test',
+    checkoutInfo: '{}',
+  });
+  const size = 64;
+  const data = new Uint8Array(size * size * 4);
+  for (let y = 8; y < 56; y++)
+    for (let x = 8; x < 56; x++)
+      data.set([51, 88, 231, 255], (y * size + x) * 4);
+  const png = encode({
+    data,
+    width: size,
+    height: size,
+    depth: 8,
+    channels: 4,
+  });
+  const runtime = globalThis as typeof globalThis & {
+    __CF_ENV__?: Record<string, unknown>;
+  };
+  const previousEnv = runtime.__CF_ENV__;
+  const objects = new Map<string, Uint8Array | string>();
+  runtime.__CF_ENV__ = {
+    ...previousEnv,
+    SVG_ARCHIVE: {
+      async put(key: string, value: Uint8Array | string) {
+        if (!objects.has(key)) objects.set(key, value);
+      },
+      async head(key: string) {
+        return objects.has(key) ? {} : null;
+      },
+      async get(key: string) {
+        const value = objects.get(key);
+        return value ? { body: new Response(Buffer.from(value)).body } : null;
+      },
+      async delete(key: string) {
+        objects.delete(key);
+      },
+    },
+  };
+  let sourceUrl: string | undefined;
+  let submits = 0;
+  let shouldReject = false;
+  globalThis.fetch = (async (url, init) => {
+    if (String(url) === 'https://assets.seeapi.com/edited.png') {
+      assert.equal(new Headers(init?.headers).has('Authorization'), false);
+      return new Response(Buffer.from(png));
+    }
+    if (init?.method === 'POST') {
+      submits++;
+      const body = JSON.parse(String(init.body));
+      assert.equal(body.endpoint, 'image-to-image');
+      assert.equal(body.input.output_format, 'png');
+      assert.equal(body.input.background, 'transparent');
+      sourceUrl = body.input.input_images[0];
+      const source = await serveImageSource(new Request(sourceUrl!));
+      assert.deepEqual(new Uint8Array(await source.arrayBuffer()), png);
+      assert.equal(source.headers.get('cache-control'), 'private, no-store');
+      const tampered = new URL(sourceUrl!);
+      tampered.searchParams.set('sig', '0'.repeat(64));
+      assert.equal((await serveImageSource(new Request(tampered))).status, 404);
+      return shouldReject
+        ? new Response(null, { status: 422 })
+        : Response.json({
+            generation: { id: 'task_edit', status: 'processing' },
+          });
+    }
+    return Response.json({
+      generation: {
+        id: 'task_edit',
+        status: 'succeeded',
+        consumed_credits: 11.661,
+        result: {
+          assets: [
+            {
+              url: 'https://assets.seeapi.com/edited.png',
+              mime_type: 'image/png',
+            },
+          ],
+        },
+      },
+    });
+  }) as typeof fetch;
+  try {
+    const params = {
+      userId,
+      paidOrderId,
+      id: 'image_' + 'a'.repeat(64),
+      input: {
+        image: Buffer.from(png).toString('base64'),
+        colors: 8,
+        removeBackground: true,
+      },
+      credentials,
+    };
+    const queued = await startSvgImageEdit(params);
+    assert.equal(queued.status, 'processing');
+    assert.equal(await getBalance(userId), 840);
+    const completed = await startSvgImageEdit(params);
+    assert.equal(completed.status, 'succeeded');
+    assert.match(completed.svg!, /<path/);
+    assert.doesNotMatch(completed.svg!, /<image/);
+    assert.deepEqual(await startSvgImageEdit(params), completed);
+    assert.equal(await getBalance(userId), 840);
+    assert.equal(submits, 1);
+    assert.equal((await serveImageSource(new Request(sourceUrl!))).status, 404);
+    assert.equal(objects.get(`tasks/${params.id}.svg`), completed.svg);
+
+    shouldReject = true;
+    const declined = await startSvgImageEdit({
+      ...params,
+      id: 'image_' + 'b'.repeat(64),
+    });
+    assert.equal(declined.status, 'failed');
+    assert.equal(declined.credits, 0);
+    assert.equal(await getBalance(userId), 840);
+    assert.equal((await serveImageSource(new Request(sourceUrl!))).status, 404);
+  } finally {
+    globalThis.fetch = realFetch;
+    runtime.__CF_ENV__ = previousEnv;
+  }
+});
 
 test('complete asynchronous SeeAPI pipeline reserves, polls, sanitizes the native SVG and settles actual cost', async () => {
   const { userId } = await fixture();

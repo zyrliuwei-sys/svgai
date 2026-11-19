@@ -1,4 +1,4 @@
-import { imageTraceOptions } from '@/lib/svg-trace-options';
+import { traceRaster } from '@/lib/svg-trace-options';
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const MAX_IMAGE_PIXELS = 20_000_000;
@@ -589,13 +589,7 @@ export async function vectorizeImage(
     await new Promise<void>((resolve) =>
       requestAnimationFrame(() => resolve())
     );
-    // @ts-expect-error ImageTracerJS does not publish TypeScript declarations.
-    const imported = await import('imagetracerjs');
-    const tracer = imported.default ?? imported;
-    const svg: string = tracer.imagedataToSVG(
-      pixels,
-      imageTraceOptions(pixels, options.colors)
-    );
+    const svg = await traceRaster(pixels, options.colors);
     const safe = sanitizeSVG(svg).replace(
       /<path\b(?=[^>]*\bopacity="0(?:\.0+)?")[^>]*\/>/g,
       ''

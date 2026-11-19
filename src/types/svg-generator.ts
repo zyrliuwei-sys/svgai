@@ -39,6 +39,7 @@ export interface SvgTrialResult {
 }
 export interface SvgAvailability {
   ready: boolean;
+  imageEdit: boolean;
   reservedCredits: number;
   balance: number | null;
   paid: boolean;

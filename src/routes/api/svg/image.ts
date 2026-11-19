@@ -1,11 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { archivedTaskSvg } from '@/server/svg-archive';
+import { startSvgImageEdit } from '@/server/svg-generation';
+import {
+  imageEditAvailable,
+  serveImageSource,
+} from '@/server/svg-image-source';
 import { svgViewer } from '@/server/svg-previews';
 import { parseImageInput, traceImage } from '@/server/svg-renderer';
 
+import { seeApiCredentials } from '@/core/ai/seeapi-generation';
 import { envConfigs } from '@/config';
 import { SVG_IMAGE_CREDITS } from '@/config/generation';
 import { fulfillSvg, TaskBillingError } from '@/modules/ai-tasks/service';
+import { getAllConfigs } from '@/modules/config/service';
 import { enforceMinIntervalRateLimit } from '@/lib/rate-limit';
 import { readRequestBytes } from '@/lib/request-body';
 import { isSameOriginRequest } from '@/lib/request-security';
@@ -39,18 +46,34 @@ async function POST({ request }: { request: Request }) {
       );
       if (
         typeof body.requestId !== 'string' ||
-        !/^[a-f0-9-]{36}$/i.test(body.requestId)
+        !/^[a-f0-9-]{36}$/i.test(body.requestId) ||
+        (body.method !== undefined && !['trace', 'ai'].includes(body.method))
       )
         throw new Error();
       input = parseImageInput(body);
     } catch {
       return respErr(m['svgai.api.invalid_input'](), { status: 400 });
     }
+    const id =
+      'image_' + (await svgIdentityHash(`${viewer.userId}:${body.requestId}`));
+    if (body.method === 'ai') {
+      const credentials = seeApiCredentials(await getAllConfigs());
+      if (!credentials || !imageEditAvailable())
+        return respErr(m['svgai.api.unavailable'](), { status: 503 });
+      return respData(
+        await startSvgImageEdit({
+          id,
+          userId: viewer.userId,
+          paidOrderId: viewer.paidOrderId,
+          credentials,
+          input,
+        }),
+        { headers: { 'cache-control': 'no-store' } }
+      );
+    }
     const svg = await traceImage(input);
     const task = await fulfillSvg({
-      id:
-        'image_' +
-        (await svgIdentityHash(`${viewer.userId}:${body.requestId}`)),
+      id,
       userId: viewer.userId,
       paidOrderId: viewer.paidOrderId,
       provider: 'svgai-trace',
@@ -90,5 +113,7 @@ async function POST({ request }: { request: Request }) {
   }
 }
 export const Route = createFileRoute('/api/svg/image')({
-  server: { handlers: { POST } },
+  server: {
+    handlers: { POST, GET: ({ request }) => serveImageSource(request) },
+  },
 });

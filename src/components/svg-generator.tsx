@@ -120,6 +120,8 @@ export function SvgGenerator({
   } | null>(null);
   const [removeBackground, setRemoveBackground] = useState(true);
   const [colorCount, setColorCount] = useState(8);
+  const [imageMethod, setImageMethod] = useState<'trace' | 'ai'>('trace');
+  const [pendingImageTask, setPendingImageTask] = useState<string>();
   const [dragging, setDragging] = useState(false);
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(false);
@@ -144,6 +146,52 @@ export function SvgGenerator({
         ? 3000
         : false,
   });
+  const canEditImage = availability.data?.paid && availability.data.imageEdit;
+  const useImageEdit = canEditImage && imageMethod === 'ai';
+
+  async function finishImageResult(result: SvgGenerationResult, owner: string) {
+    const storageKey = `svgai-image-task-${owner}`;
+    if (result.status === 'processing') {
+      setPendingImageTask(result.taskId);
+      try {
+        localStorage.setItem(storageKey, result.taskId);
+      } catch {
+        /* Optional recovery after reload. */
+      }
+    }
+    const deadline = Date.now() + 300_000;
+    const taskUrl = `/api/svg/generate?taskId=${encodeURIComponent(result.taskId)}`;
+    while (result.status === 'processing' && Date.now() < deadline) {
+      await new Promise((resolve) => setTimeout(resolve, 3500));
+      try {
+        result = await apiGet<SvgGenerationResult>(taskUrl);
+      } catch (error) {
+        if (
+          error instanceof ApiError &&
+          [401, 402, 403, 404].includes(error.status ?? 0)
+        )
+          throw error;
+      }
+    }
+    if (result.status === 'processing') throw new Error(copy.still_processing);
+    setPendingImageTask(undefined);
+    try {
+      localStorage.removeItem(storageKey);
+      localStorage.removeItem(`svgai-image-request-${owner}`);
+      if (result.svg)
+        localStorage.setItem(
+          `svgai-last-result-${owner}`,
+          JSON.stringify({ mode: 'image', taskId: result.taskId })
+        );
+    } catch {
+      /* Optional result recovery. */
+    }
+    imageRequestId.current = null;
+    if (!result.svg) throw new Error(copy.failed_refunded);
+    setChargedCredits(result.credits);
+    return { svg: sanitizeSvg(result.svg) };
+  }
+
   const generate = useMutation({
     mutationFn: async (value: {
       prompt: string;
@@ -214,22 +262,29 @@ export function SvgGenerator({
         return { trial: result };
       }
       if (value.mode === 'image') {
-        if (value.taskId) {
-          const saved = await apiGet<SvgGenerationResult>(
-            `/api/svg/generate?taskId=${encodeURIComponent(value.taskId)}`
-          );
-          if (!saved.svg) throw new Error(copy.generation_error);
-          return { svg: sanitizeSvg(saved.svg) };
-        }
-        if (!file) throw new Error(copy.upload_required);
         if (!session?.user) throw new Error(copy.sign_in_required);
+        const existingTask = value.taskId ?? pendingImageTask;
+        if (existingTask)
+          return finishImageResult(
+            await apiGet<SvgGenerationResult>(
+              `/api/svg/generate?taskId=${encodeURIComponent(existingTask)}`
+            ),
+            session.user.id
+          );
+        if (!file) throw new Error(copy.upload_required);
+        const method = useImageEdit ? 'ai' : 'trace';
         const image = await prepareImagePng(file);
         const fingerprint = Array.from(
           new Uint8Array(
             await crypto.subtle.digest(
               'SHA-256',
               new TextEncoder().encode(
-                JSON.stringify({ image, colors: colorCount, removeBackground })
+                JSON.stringify({
+                  image,
+                  colors: colorCount,
+                  removeBackground,
+                  ...(useImageEdit ? { method } : {}),
+                })
               )
             )
           ),
@@ -265,6 +320,7 @@ export function SvgGenerator({
             image,
             colors: colorCount,
             removeBackground,
+            method,
           });
         } catch (error) {
           if (
@@ -280,19 +336,7 @@ export function SvgGenerator({
           }
           throw error;
         }
-        imageRequestId.current = null;
-        try {
-          localStorage.removeItem(storageKey);
-          localStorage.setItem(
-            `svgai-last-result-${session.user.id}`,
-            JSON.stringify({ mode: 'image', taskId: result.taskId })
-          );
-        } catch {
-          /* Server-side idempotency remains authoritative. */
-        }
-        if (!result.svg) throw new Error(copy.generation_error);
-        setChargedCredits(result.credits);
-        return { svg: sanitizeSvg(result.svg) };
+        return finishImageResult(result, session.user.id);
       }
       if (!availability.data?.ready) throw new Error(copy.model_unavailable);
       if (!session?.user) throw new Error(copy.sign_in_required);
@@ -428,8 +472,8 @@ export function SvgGenerator({
       setChargedCredits(null);
     },
     onSuccess: (result) => {
-      if (result.trial) setTrialPreview(result.trial);
-      else if (result.svg) {
+      if ('trial' in result && result.trial) setTrialPreview(result.trial);
+      else if ('svg' in result && result.svg) {
         setSvg(result.svg);
         setTrialPreview(null);
       }
@@ -520,6 +564,15 @@ export function SvgGenerator({
       return;
     resumed.current = true;
     try {
+      const imageTask = localStorage.getItem(
+        `svgai-image-task-${session.user.id}`
+      );
+      if (imageTask) {
+        setPendingImageTask(imageTask);
+        setMode('image');
+        generate.mutate({ prompt: '', mode: 'image', taskId: imageTask });
+        return;
+      }
       const pending = JSON.parse(
         localStorage.getItem(`svgai-pending-${session.user.id}`) || 'null'
       );
@@ -1016,6 +1069,36 @@ export function SvgGenerator({
                   </>
                 )}
               </div>
+              {canEditImage && (
+                <>
+                  <div className="svg-option-row">
+                    <label htmlFor="svg-image-method">
+                      {copy.conversion_method}
+                    </label>
+                    <select
+                      id="svg-image-method"
+                      value={imageMethod}
+                      disabled={generate.isPending}
+                      aria-describedby={
+                        useImageEdit ? 'svg-ai-image-note' : undefined
+                      }
+                      onChange={(event) =>
+                        setImageMethod(
+                          event.target.value === 'ai' ? 'ai' : 'trace'
+                        )
+                      }
+                    >
+                      <option value="trace">{copy.direct_trace}</option>
+                      <option value="ai">{copy.ai_illustration}</option>
+                    </select>
+                  </div>
+                  {useImageEdit && (
+                    <p className="svg-input-note" id="svg-ai-image-note">
+                      {copy.ai_image_note}
+                    </p>
+                  )}
+                </>
+              )}
               <div className="svg-option-row">
                 <label htmlFor="svg-colors">{copy.colors_label}</label>
                 <select
@@ -1038,7 +1121,11 @@ export function SvgGenerator({
                   disabled={generate.isPending}
                   onChange={(e) => setRemoveBackground(e.target.checked)}
                 />
-                <span>{copy.remove_background}</span>
+                <span>
+                  {useImageEdit
+                    ? copy.remove_photo_background
+                    : copy.remove_background}
+                </span>
               </label>
             </>
           )}
@@ -1051,6 +1138,7 @@ export function SvgGenerator({
                 exportBusy ||
                 (mode === 'image' &&
                   !file &&
+                  !pendingImageTask &&
                   trialPreview?.status !== 'processing')
               }
             >
@@ -1072,7 +1160,9 @@ export function SvgGenerator({
                         ? pendingTask
                           ? copy.resume_generation
                           : copy.generate
-                        : copy.vectorize}
+                        : pendingImageTask
+                          ? copy.resume_generation
+                          : copy.vectorize}
               </span>
               {!generate.isPending && <ArrowRight size={16} />}
             </button>

@@ -415,7 +415,7 @@ export async function settleGeneration(params: {
           metadata: JSON.stringify({
             taskId: task.id,
             providerCredits: params.result.providerCredits,
-            multiplier: 8,
+            multiplier: params.result.multiplier,
           }),
         }),
         ...(extra ? extra.steps(q) : []),

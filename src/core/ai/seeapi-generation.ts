@@ -1,3 +1,4 @@
+import { SVG_MODEL } from '@/config/generation';
 import { normalizeSeeApiConfigs } from '@/config/seeapi';
 
 export class SeeApiError extends Error {
@@ -106,7 +107,7 @@ export function createSeeApiGeneration(
     method: 'POST',
     headers: { 'Idempotency-Key': params.idempotencyKey },
     body: JSON.stringify({
-      model: 'gpt-image-2-6-sunburst',
+      model: SVG_MODEL,
       endpoint: 'text-to-image',
       provider: 'seeapi',
       input: {
@@ -117,6 +118,40 @@ export function createSeeApiGeneration(
         complexity: 'high',
         output_format: 'svg',
         background: 'auto',
+        moderation: 'auto',
+      },
+    }),
+  });
+}
+
+export function createSeeApiImageEdit(
+  credentials: { apiKey: string; baseUrl: string },
+  params: {
+    idempotencyKey: string;
+    sourceUrl: string;
+    colors: number;
+    removeBackground: boolean;
+  }
+) {
+  const backdrop = params.removeBackground
+    ? 'Isolate the original subject on a truly transparent background. Remove the scene and cast shadows.'
+    : 'Keep the original framing and simplify the background into a few broad shapes.';
+  return generationRequest(credentials, '', {
+    method: 'POST',
+    headers: { 'Idempotency-Key': params.idempotencyKey },
+    body: JSON.stringify({
+      model: SVG_MODEL,
+      endpoint: 'image-to-image',
+      provider: 'seeapi',
+      input: {
+        prompt: `Turn this reference into a clean flat vector-style illustration for automatic tracing. Preserve the subject's likeness, pose, silhouette, crop, clothing and key colors. Keep natural skin tones and readable facial details. Use at most ${params.colors} broad, solid color fills with smooth closed boundaries. Simplify gradients, shadows and fine textures into intentional shapes. Do not add lettering, halftone, grain or new elements. ${backdrop}`,
+        input_images: [params.sourceUrl],
+        aspect_ratio: 'auto',
+        resolution: '1K',
+        quality: 'medium',
+        complexity: 'high',
+        output_format: 'png',
+        background: params.removeBackground ? 'transparent' : 'opaque',
         moderation: 'auto',
       },
     }),
@@ -135,13 +170,13 @@ export async function getSeeApiGeneration(
   return generation;
 }
 
-/** Assets are fetched anonymously from SeeAPI only; the API key never follows an asset URL. */
-export async function downloadSeeApiSvg(url: string): Promise<string> {
+/** Assets are fetched anonymously from SeeAPI only. */
+export async function downloadSeeApiAsset(url: string, maxBytes: number) {
   let parsed: URL;
   try {
     parsed = new URL(url);
   } catch {
-    throw new SeeApiError();
+    throw new SeeApiError(422);
   }
   if (
     parsed.protocol !== 'https:' ||
@@ -155,14 +190,14 @@ export async function downloadSeeApiSvg(url: string): Promise<string> {
     parsed.password ||
     parsed.port
   )
-    throw new SeeApiError();
+    throw new SeeApiError(422);
   const response = await fetch(parsed.href, {
     redirect: 'manual',
     signal: AbortSignal.timeout(20_000),
   });
   if (!response.ok || !response.body) {
     await response.body?.cancel();
-    throw new SeeApiError();
+    throw new SeeApiError(response.ok ? 422 : response.status);
   }
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
@@ -172,9 +207,9 @@ export async function downloadSeeApiSvg(url: string): Promise<string> {
       const { done, value } = await reader.read();
       if (done) break;
       bytes += value.length;
-      if (bytes > 1_500_000) {
+      if (bytes > maxBytes) {
         await reader.cancel();
-        throw new SeeApiError();
+        throw new SeeApiError(413);
       }
       chunks.push(value);
     }
@@ -187,5 +222,11 @@ export async function downloadSeeApiSvg(url: string): Promise<string> {
     result.set(chunk, offset);
     offset += chunk.length;
   }
-  return new TextDecoder('utf-8', { fatal: true }).decode(result);
+  return result;
+}
+
+export async function downloadSeeApiSvg(url: string): Promise<string> {
+  return new TextDecoder('utf-8', { fatal: true }).decode(
+    await downloadSeeApiAsset(url, 1_500_000)
+  );
 }

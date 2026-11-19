@@ -2,6 +2,8 @@ import type { SvgGenerationResult } from '@/types/svg-generator';
 
 import {
   createSeeApiGeneration,
+  createSeeApiImageEdit,
+  downloadSeeApiAsset,
   downloadSeeApiSvg,
   getSeeApiGeneration,
   seeApiCredentials,
@@ -10,6 +12,7 @@ import {
 import type { aiTask } from '@/config/db/schema';
 import {
   generationCredits,
+  SVG_IMAGE_CREDITS,
   SVG_MODEL,
   SVG_RESERVED_CREDITS,
 } from '@/config/generation';
@@ -26,11 +29,20 @@ import {
   type SvgInput,
 } from '@/modules/svg-generator/service';
 import { getSvgStats, sanitizeSvg } from '@/lib/svg-vectorizer';
+import { svgIdentityHash } from '@/lib/svg-visitor';
 
 import { archivedTaskSvg } from './svg-archive';
+import {
+  deleteImageSource,
+  imageSourceExpires,
+  imageSourceUrl,
+  stageImageSource,
+} from './svg-image-source';
+import { traceEditedImage, type SvgImageInput } from './svg-renderer';
 
 type Task = typeof aiTask.$inferSelect;
 type Credentials = NonNullable<ReturnType<typeof seeApiCredentials>>;
+const imageEditModel = `${SVG_MODEL}:image-to-image`;
 
 export async function ownedSvgTask(
   id: string,
@@ -96,6 +108,7 @@ export async function refreshSvgGeneration(
 ): Promise<SvgGenerationResult> {
   if (task.status === 'success' || task.status === 'failed')
     return taskResult(task);
+  if (task.model === imageEditModel) return refreshImageEdit(task, credentials);
   let providerTask;
   if (!task.taskId) {
     const input = parseSvgInput(JSON.parse(task.options || '{}'));
@@ -198,4 +211,102 @@ export async function refreshSvgGeneration(
       };
     throw error;
   }
+}
+
+export async function startSvgImageEdit(params: {
+  id: string;
+  userId: string;
+  paidOrderId: string;
+  input: SvgImageInput;
+  credentials: Credentials;
+}) {
+  const task = await reserveGeneration({
+    id: params.id,
+    userId: params.userId,
+    paidOrderId: params.paidOrderId,
+    model: imageEditModel,
+    prompt: '',
+    options: JSON.stringify({
+      imageEdit: true,
+      imageHash: await svgIdentityHash(params.input.image),
+      colors: params.input.colors,
+      removeBackground: params.input.removeBackground,
+    }),
+    credits: SVG_IMAGE_CREDITS,
+  });
+  if (
+    !task.taskId &&
+    task.status === 'pending' &&
+    imageSourceExpires(task.createdAt) > Date.now()
+  )
+    await stageImageSource(task.id, params.input.image);
+  return refreshSvgGeneration(task, params.credentials);
+}
+
+async function settleImageEdit(
+  task: Task,
+  reason: string,
+  result?: { svg: string; providerCredits?: number }
+) {
+  const finished = await settleGeneration({
+    taskId: task.id,
+    credits: result ? SVG_IMAGE_CREDITS : 0,
+    failed: !result,
+    result: result ?? { reason },
+  });
+  await deleteImageSource(task.id);
+  return taskResult(finished);
+}
+
+async function refreshImageEdit(task: Task, credentials: Credentials) {
+  const { colors, removeBackground } = JSON.parse(
+    task.options!
+  ) as SvgImageInput;
+  let providerTask;
+  if (!task.taskId) {
+    const expires = imageSourceExpires(task.createdAt);
+    if (expires <= Date.now()) return settleImageEdit(task, 'source_expired');
+    const sourceUrl = await imageSourceUrl(task.id, expires);
+    if (!sourceUrl) return taskResult(task);
+    try {
+      providerTask = await createSeeApiImageEdit(credentials, {
+        idempotencyKey: task.id,
+        sourceUrl,
+        colors,
+        removeBackground,
+      });
+    } catch (error) {
+      if (error instanceof SeeApiError && error.rejected)
+        return settleImageEdit(task, 'provider_rejected');
+      throw error;
+    }
+    task = await attachGeneration(task.id, providerTask.id);
+  } else {
+    providerTask = await getSeeApiGeneration(credentials, task.taskId);
+  }
+  if (providerTask.status === 'processing') return taskResult(task);
+  if (providerTask.status !== 'succeeded')
+    return settleImageEdit(task, 'generation_failed');
+  const asset = providerTask.assets.find(
+    (item) => item.mimeType === 'image/png'
+  );
+  if (!asset) return settleImageEdit(task, 'invalid_output');
+  let bytes;
+  try {
+    bytes = await downloadSeeApiAsset(asset.url, 12_000_000);
+  } catch (error) {
+    if (error instanceof SeeApiError && [413, 422].includes(error.status))
+      return settleImageEdit(task, 'invalid_output');
+    throw error;
+  }
+  let svg;
+  try {
+    svg = await traceEditedImage(bytes, colors, removeBackground);
+  } catch {
+    return settleImageEdit(task, 'invalid_output');
+  }
+  return settleImageEdit(task, '', {
+    svg,
+    providerCredits: providerTask.consumedCredits,
+  });
 }

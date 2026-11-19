@@ -4,6 +4,7 @@ import {
   refreshSvgGeneration,
   startSvgGeneration,
 } from '@/server/svg-generation';
+import { imageEditAvailable } from '@/server/svg-image-source';
 import { publicPreview, svgViewer } from '@/server/svg-previews';
 
 import { seeApiCredentials } from '@/core/ai/seeapi-generation';
@@ -82,6 +83,7 @@ async function GET({ request }: { request: Request }) {
       return respData(
         {
           ready: Boolean(credentials),
+          imageEdit: Boolean(credentials && imageEditAvailable()),
           reservedCredits: SVG_RESERVED_CREDITS,
           balance: viewer.userId ? await getBalance(viewer.userId) : null,
           paid: Boolean(viewer.paidOrderId),

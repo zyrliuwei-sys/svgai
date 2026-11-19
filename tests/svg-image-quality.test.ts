@@ -20,13 +20,14 @@ function artwork(paint: (x: number, y: number) => Pixel, size = 64) {
 
 async function convert(
   pixels: ReturnType<typeof artwork>,
-  removeBackground = false
+  removeBackground = false,
+  colors = 4
 ) {
   const png = encode({ ...pixels, channels: 4, depth: 8 });
   const svg = await traceImage(
     parseImageInput({
       image: Buffer.from(png).toString('base64'),
-      colors: 4,
+      colors,
       removeBackground,
     })
   );
@@ -57,6 +58,25 @@ test('removing a green background preserves connected low-contrast dark hair', a
   const output = await convert(pixels, true);
   assert.deepEqual(output.at(32, 20), hair);
   assert.equal(output.at(0, 0)[3], 0);
+});
+
+test('a small warm subject stays colored against a large gray gradient', async () => {
+  const output = await convert(
+    artwork((x, y) => {
+      if (x > 46 && x < 79 && y > 41 && y < 95) {
+        const shade = Math.floor((x - 46) * 1.2);
+        return [177 + shade, 120 + shade, 95 + shade, 255];
+      }
+      const shade = 103 + Math.floor((x + y) / 3);
+      return [shade + 6, shade + 3, shade, 255];
+    }, 128),
+    true,
+    8
+  );
+  const [r, , b, a] = output.at(64, 65);
+  assert.ok(r - b >= 60);
+  assert.equal(a, 255);
+  assert.equal(output.at(32, 32)[3], 255);
 });
 
 test('background removal leaves varied image borders and enclosed white regions intact', () => {

@@ -22,7 +22,9 @@ The provider also processes and may retain prompts, generated files, and task re
 
 ### Image to SVG
 
-Your browser resizes the PNG, JPG, or WebP image you select, then sends a normalized copy to our servers for vector conversion. The image converter does not send your source image to an AI provider. A temporary image copy may be stored while processing is pending. After successful conversion, we retain the vector result and a raster preview to support recovery and downloads.
+Your browser resizes the PNG, JPG, or WebP image you select and sends a normalized copy to our servers. Direct tracing, including the free image preview, processes this copy on our servers. A temporary image copy may be stored while processing is pending. After successful conversion, we retain the vector result and a raster preview to support recovery and downloads.
+
+If you choose AI illustration, SeeAPI receives the normalized image through a short-lived link and returns an illustration for vector conversion. We remove the temporary copy used for that link when processing finishes, with automatic cleanup for abandoned uploads. SeeAPI may retain the image, output, and task record under its [data-handling policy](https://www.seeapi.com/docs/data-handling/).
 
 Before payment, the browser receives a raster preview rather than the editable SVG source. Access to a saved preview requires the original visitor session or its linked account. Downloading an editable SVG requires a verified paid purchase and any applicable credit charge.
 
