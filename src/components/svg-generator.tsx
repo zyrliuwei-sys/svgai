@@ -100,6 +100,7 @@ export function SvgGenerator({
   const resumed = useRef(false);
   const draftRestored = useRef(false);
   const sampleSelected = useRef(false);
+  const modeChosen = useRef(false);
   const pendingRequest = useRef<{
     owner: string;
     request: SvgGenerationRequest;
@@ -131,6 +132,11 @@ export function SvgGenerator({
   const copiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const svgStats = useMemo(() => getSvgStats(svg), [svg]);
   const stats = trialPreview?.stats || svgStats;
+
+  function chooseMode(next: SvgMode) {
+    modeChosen.current = true;
+    setMode(next);
+  }
 
   const availability = useQuery({
     queryKey: ['svg-generation-availability', session?.user.id],
@@ -497,6 +503,7 @@ export function SvgGenerator({
   const form = useForm({
     defaultValues: { prompt: initial.prompt },
     onSubmit: ({ value }) => {
+      modeChosen.current = true;
       if (trialPreview?.status === 'processing') {
         generate.mutate({
           prompt: value.prompt,
@@ -559,6 +566,7 @@ export function SvgGenerator({
       !session?.user ||
       !availability.data?.paid ||
       resumed.current ||
+      modeChosen.current ||
       new URLSearchParams(window.location.search).has('resumePreview')
     )
       return;
@@ -621,7 +629,16 @@ export function SvgGenerator({
 
   useEffect(() => {
     const preview = availability.data?.preview;
-    if (!preview || sampleSelected.current || success || generate.isPending)
+    // Recovery is for entering the tool. An older preview must not take over
+    // after the visitor chooses a tab or starts working with a new file.
+    if (
+      !preview ||
+      modeChosen.current ||
+      (initialMode === 'image' && preview.mode !== 'image') ||
+      sampleSelected.current ||
+      success ||
+      generate.isPending
+    )
       return;
     if (preview.status !== 'failed') {
       setTrialPreview(preview);
@@ -637,7 +654,12 @@ export function SvgGenerator({
         trialId: preview.previewId,
       });
     }
-  }, [availability.data?.preview, availability.data?.paid, success]);
+  }, [
+    availability.data?.preview,
+    availability.data?.paid,
+    initialMode,
+    success,
+  ]);
 
   const loadSample = (sample: SvgSample) => {
     sampleSelected.current = true;
@@ -714,6 +736,7 @@ export function SvgGenerator({
       setError(copy.file_too_large);
       return;
     }
+    chooseMode('image');
     setFile(incoming);
     setError('');
     setSuccess(false);
@@ -733,7 +756,6 @@ export function SvgGenerator({
       );
       if (!image) return;
       event.preventDefault();
-      setMode('image');
       acceptFile(image);
     };
     document.addEventListener('paste', paste);
@@ -881,14 +903,14 @@ export function SvgGenerator({
               disabled={generate.isPending}
               className={mode === id ? 'is-active' : ''}
               onClick={() => {
-                setMode(id);
+                chooseMode(id);
                 setError('');
               }}
               onKeyDown={(event) => {
                 if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
                   event.preventDefault();
                   const next = mode === 'text' ? 'image' : 'text';
-                  setMode(next);
+                  chooseMode(next);
                   document.getElementById(`svg-tab-${next}`)?.focus();
                 }
               }}
