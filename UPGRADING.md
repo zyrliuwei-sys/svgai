@@ -46,6 +46,16 @@ exports, permission codes, and behavior that changes for end users.
 
 ---
 
+## 2026-11-19: Private R2 archive for generated SVGs
+
+The production Worker needs a private `SVG_ARCHIVE` R2 binding when
+`SVG_ARCHIVE_REQUIRED=true`. Provision the bucket before deploying. Use a
+separate bucket from public uploads. Existing authorization and download
+endpoints continue to use the committed D1 result. Successful results are
+archived before delivery and retries use the same object key. Previously
+generated files are archived when accessed again or can be copied from D1
+using the same object keys. No schema migration is required.
+
 ## 2026-11-19: SVG generation on Cloudflare Workers
 
 Rebuild and redeploy the SVG generator and SeeAPI connection check. Workers

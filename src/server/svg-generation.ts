@@ -27,6 +27,8 @@ import {
 } from '@/modules/svg-generator/service';
 import { getSvgStats, sanitizeSvg } from '@/lib/svg-vectorizer';
 
+import { archivedTaskSvg } from './svg-archive';
+
 type Task = typeof aiTask.$inferSelect;
 type Credentials = NonNullable<ReturnType<typeof seeApiCredentials>>;
 
@@ -42,8 +44,7 @@ export async function ownedSvgTask(
     : undefined;
 }
 
-function taskResult(task: Task): SvgGenerationResult {
-  const result = task.taskResult ? JSON.parse(task.taskResult) : {};
+async function taskResult(task: Task): Promise<SvgGenerationResult> {
   return {
     taskId: task.id,
     status:
@@ -53,7 +54,7 @@ function taskResult(task: Task): SvgGenerationResult {
           ? 'failed'
           : 'processing',
     credits: task.costCredits,
-    ...(task.status === 'success' ? { svg: result.svg } : {}),
+    ...(task.status === 'success' ? { svg: await archivedTaskSvg(task) } : {}),
   };
 }
 

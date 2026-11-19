@@ -10,12 +10,19 @@
   "vars": {
     "DATABASE_PROVIDER": "d1",
     "VITE_APP_URL": "https://aisvg-generator.com",
-    "SVG_FREE_PREVIEW_DAILY_LIMIT": "100"
+    "SVG_FREE_PREVIEW_DAILY_LIMIT": "100",
+    "SVG_ARCHIVE_REQUIRED": "true"
   },
   "routes": [
     {
       "pattern": "aisvg-generator.com",
       "custom_domain": true
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "SVG_ARCHIVE",
+      "bucket_name": "svgai-generated"
     }
   ],
   "d1_databases": [

@@ -264,6 +264,21 @@ const validSvg =
 test('complete asynchronous SeeAPI pipeline reserves, polls, sanitizes the native SVG and settles actual cost', async () => {
   const { userId } = await fixture();
   const requests: { url: string; init?: RequestInit }[] = [];
+  const runtime = globalThis as typeof globalThis & {
+    __CF_ENV__?: Record<string, unknown>;
+  };
+  const previousEnv = runtime.__CF_ENV__;
+  const archived = new Map<string, string>();
+  let storageAvailable = false;
+  runtime.__CF_ENV__ = {
+    ...previousEnv,
+    SVG_ARCHIVE: {
+      async put(key: string, svg: string) {
+        if (!storageAvailable) throw new Error('Test outage');
+        archived.set(key, svg);
+      },
+    },
+  };
   globalThis.fetch = (async (url, init) => {
     requests.push({ url: String(url), init });
     if (String(url).startsWith('https://assets.seeapi.com/')) {
@@ -301,12 +316,25 @@ test('complete asynchronous SeeAPI pipeline reserves, polls, sanitizes the nativ
     const task = await ownedSvgTask(first.taskId, userId);
     assert.ok(task);
     assert.equal(await ownedSvgTask(first.taskId, 'another-user'), undefined);
-    const result = await refreshSvgGeneration(task, credentials);
+    await assert.rejects(
+      refreshSvgGeneration(task, credentials),
+      /SVG storage is temporarily unavailable/
+    );
+    const completed = await ownedSvgTask(first.taskId, userId);
+    assert.equal(completed?.status, 'success');
+    assert.equal(await getBalance(userId), 913);
+    storageAvailable = true;
+    const [result, replay] = await Promise.all([
+      refreshSvgGeneration(completed!, credentials),
+      refreshSvgGeneration(completed!, credentials),
+    ]);
     assert.equal(result.status, 'succeeded');
+    assert.deepEqual(replay, result);
     assert.equal(result.credits, 87);
     assert.equal(await getBalance(userId), 913);
     assert.match(result.svg!, /<path/);
     assert.doesNotMatch(result.svg!, /<title/);
+    assert.equal(archived.get(`tasks/${first.taskId}.svg`), result.svg);
     const body = JSON.parse(String(requests[0].init?.body));
     assert.equal(body.model, 'gpt-image-2-6-sunburst');
     assert.equal(body.provider, 'seeapi');
@@ -318,6 +346,7 @@ test('complete asynchronous SeeAPI pipeline reserves, polls, sanitizes the nativ
     await refreshSvgGeneration((await findTask(first.taskId))!, credentials);
     assert.equal(requests.length, 3);
   } finally {
+    runtime.__CF_ENV__ = previousEnv;
     globalThis.fetch = realFetch;
   }
 });

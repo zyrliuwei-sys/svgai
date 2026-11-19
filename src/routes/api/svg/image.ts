@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { archivedTaskSvg } from '@/server/svg-archive';
 import { svgViewer } from '@/server/svg-previews';
 import { parseImageInput, traceImage } from '@/server/svg-renderer';
 
@@ -66,7 +67,7 @@ async function POST({ request }: { request: Request }) {
       taskId: task.id,
       status: 'succeeded',
       credits: task.costCredits,
-      svg: JSON.parse(task.taskResult!).svg,
+      svg: await archivedTaskSvg(task),
     });
   } catch (error) {
     return respErr(

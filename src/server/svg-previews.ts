@@ -23,6 +23,7 @@ import {
 import { getSvgStats, outlineSvg, sanitizeSvg } from '@/lib/svg-vectorizer';
 import { svgVisitor } from '@/lib/svg-visitor';
 
+import { archivePreviewFiles } from './svg-archive';
 import { providerPrompt } from './svg-generation';
 import { parseImageInput, rasterizeSvg, traceImage } from './svg-renderer';
 
@@ -75,6 +76,8 @@ export async function renderPreviewAsset(
     (outline && !row.svg)
   )
     throw new PreviewError('not_found');
+  // The color image also restores an archive if the original save failed.
+  if (!outline) await archivePreviewFiles(row);
   const png = outline
     ? await rasterizeSvg(outlineSvg(row.svg!))
     : row.previewPng;
@@ -82,7 +85,10 @@ export async function renderPreviewAsset(
 }
 
 export async function refreshPreview(row: Preview) {
-  if (['succeeded', 'failed'].includes(row.status)) return row;
+  if (['succeeded', 'failed'].includes(row.status)) {
+    await archivePreviewFiles(row);
+    return row;
+  }
   const input = JSON.parse(row.options);
   let svg: string;
   let credits = SVG_IMAGE_CREDITS;
@@ -135,24 +141,27 @@ export async function refreshPreview(row: Preview) {
       return completePreview(row, null);
     }
   }
+  const stats = getSvgStats(svg);
+  if (
+    stats.bytes > 250_000 ||
+    (!stats.paths &&
+      !/<(?:rect|circle|ellipse|polygon|polyline|line)\b/.test(svg))
+  )
+    return completePreview(row, null);
+  let previewPng: string;
   try {
-    const stats = getSvgStats(svg);
-    if (
-      stats.bytes > 250_000 ||
-      (!stats.paths &&
-        !/<(?:rect|circle|ellipse|polygon|polyline|line)\b/.test(svg))
-    )
-      return completePreview(row, null);
-    const previewPng = await rasterizeSvg(svg);
-    return completePreview(row, {
-      svg,
-      previewPng,
-      credits,
-      stats: JSON.stringify(stats),
-    });
+    previewPng = await rasterizeSvg(svg);
   } catch {
     return completePreview(row, null);
   }
+  const completed = await completePreview(row, {
+    svg,
+    previewPng,
+    credits,
+    stats: JSON.stringify(stats),
+  });
+  await archivePreviewFiles(completed);
+  return completed;
 }
 export async function unlockPreview(
   viewer: Awaited<ReturnType<typeof svgViewer>>,
@@ -163,6 +172,7 @@ export async function unlockPreview(
   row = await bindPreview(row, viewer.visitorHash, viewer.userId);
   if (row.status !== 'succeeded' || !row.svg)
     throw new PreviewError('not_found');
+  await archivePreviewFiles(row);
   return fulfillSvg({
     id: `preview_unlock_${row.id}`,
     userId: viewer.userId,

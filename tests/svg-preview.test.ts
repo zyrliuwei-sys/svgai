@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdtemp, rm } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
@@ -399,6 +399,32 @@ test('anonymous text generation uses one stable upstream idempotency key and onl
     }),
   });
   let row = await claimPreview(params);
+  const { getPlatformProxy } = await import('wrangler');
+  const configPath = join(directory, 'archive.json');
+  await writeFile(
+    configPath,
+    JSON.stringify({
+      name: 'svg-archive-test',
+      compatibility_date: '2026-10-01',
+      r2_buckets: [{ binding: 'SVG_ARCHIVE', bucket_name: 'svg-test-private' }],
+    })
+  );
+  const platform = await getPlatformProxy<{
+    SVG_ARCHIVE: {
+      get(key: string): Promise<{
+        text(): Promise<string>;
+        arrayBuffer(): Promise<ArrayBuffer>;
+        httpMetadata: { contentType: string };
+      } | null>;
+      list(): Promise<{ objects: { key: string }[] }>;
+    };
+  }>({ configPath, persist: false, remoteBindings: false });
+  const runtime = globalThis as typeof globalThis & {
+    __CF_ENV__?: Record<string, unknown>;
+  };
+  const previousEnv = runtime.__CF_ENV__;
+  runtime.__CF_ENV__ = { ...previousEnv, ...platform.env };
+  const bucket = platform.env.SVG_ARCHIVE;
   const native = globalThis.fetch;
   const keys: string[] = [];
   globalThis.fetch = (async (url, init) => {
@@ -433,13 +459,28 @@ test('anonymous text generation uses one stable upstream idempotency key and onl
   try {
     row = await refreshPreview(row);
     assert.equal(row.status, 'processing');
+    assert.equal((await bucket.list()).objects.length, 0);
     row = await refreshPreview(row);
     assert.equal(row.status, 'succeeded');
     assert.equal(row.costCredits, 160);
     assert.equal(keys.length, 1);
     assert.match(keys[0], new RegExp(row.id));
     assert.equal('svg' in publicPreview(row), false);
+    await Promise.all([refreshPreview(row), renderPreviewAsset(row, row.id)]);
+    const saved = await bucket.get(`previews/${row.id}.svg`);
+    const image = await bucket.get(`previews/${row.id}.png`);
+    assert.ok(saved && image);
+    assert.equal(saved.httpMetadata.contentType, 'image/svg+xml');
+    assert.equal(image.httpMetadata.contentType, 'image/png');
+    assert.equal(await saved.text(), row.svg);
+    assert.equal(
+      Buffer.from(await image.arrayBuffer()).toString('base64'),
+      row.previewPng
+    );
+    assert.equal((await bucket.list()).objects.length, 2);
   } finally {
     globalThis.fetch = native;
+    runtime.__CF_ENV__ = previousEnv;
+    await platform.dispose();
   }
 });

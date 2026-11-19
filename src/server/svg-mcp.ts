@@ -1,3 +1,10 @@
+import { archivedTaskSvg } from '@/server/svg-archive';
+import {
+  ownedSvgTask,
+  refreshSvgGeneration,
+  startSvgGeneration,
+} from '@/server/svg-generation';
+import { parseImageInput, traceImage } from '@/server/svg-renderer';
 import {
   createMcpHandler,
   hostHeaderValidationResponse,
@@ -7,19 +14,16 @@ import {
 import { z } from 'zod';
 
 import { seeApiCredentials } from '@/core/ai/seeapi-generation';
-import { getAllConfigs } from '@/modules/config/service';
-import * as apikeys from '@/modules/apikeys/service';
-import { paidSvgOrder } from '@/modules/svg-previews/service';
-import { parseSvgInput, SvgGenerationError } from '@/modules/svg-generator/service';
-import { fulfillSvg, TaskBillingError } from '@/modules/ai-tasks/service';
 import { SVG_IMAGE_CREDITS } from '@/config/generation';
+import { fulfillSvg, TaskBillingError } from '@/modules/ai-tasks/service';
+import * as apikeys from '@/modules/apikeys/service';
+import { getAllConfigs } from '@/modules/config/service';
 import { getBalance } from '@/modules/credits/service';
 import {
-  ownedSvgTask,
-  refreshSvgGeneration,
-  startSvgGeneration,
-} from '@/server/svg-generation';
-import { parseImageInput, traceImage } from '@/server/svg-renderer';
+  parseSvgInput,
+  SvgGenerationError,
+} from '@/modules/svg-generator/service';
+import { paidSvgOrder } from '@/modules/svg-previews/service';
 import { svgIdentityHash } from '@/lib/svg-visitor';
 
 function toolResult(data: Record<string, unknown>, isError = false) {
@@ -33,29 +37,44 @@ function toolResult(data: Record<string, unknown>, isError = false) {
 function toolError(error: unknown) {
   if (error instanceof TaskBillingError) {
     const messages: Record<string, string> = {
-      insufficient_credits: 'Insufficient credits. Add credits to your VectorMint account and try again.',
-      payment_required: 'A paid VectorMint purchase is required to use the SVG API.',
-      request_conflict: 'This request ID was already used with different input. Use a new UUID.',
+      insufficient_credits:
+        'Insufficient credits. Add credits to your VectorMint account and try again.',
+      payment_required:
+        'A paid VectorMint purchase is required to use the SVG API.',
+      request_conflict:
+        'This request ID was already used with different input. Use a new UUID.',
     };
     return toolResult(
-      { error: error.code, message: messages[error.code] || 'Billing request failed.' },
+      {
+        error: error.code,
+        message: messages[error.code] || 'Billing request failed.',
+      },
       true
     );
   }
   if (error instanceof SvgGenerationError) {
     return toolResult(
-      { error: error.code, message: 'The SVG generation input or output was invalid.' },
+      {
+        error: error.code,
+        message: 'The SVG generation input or output was invalid.',
+      },
       true
     );
   }
   if (error instanceof Error && error.message === 'invalid_input') {
     return toolResult(
-      { error: 'invalid_input', message: 'The supplied image or input is invalid.' },
+      {
+        error: 'invalid_input',
+        message: 'The supplied image or input is invalid.',
+      },
       true
     );
   }
   return toolResult(
-    { error: 'internal_error', message: 'The SVG operation failed. Please try again.' },
+    {
+      error: 'internal_error',
+      message: 'The SVG operation failed. Please try again.',
+    },
     true
   );
 }
@@ -66,7 +85,8 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
       name: 'vectormint-svg',
       title: 'VectorMint AI SVG Generator',
       version: '1.0.0',
-      description: 'Paid AI-powered text-to-SVG and image-to-SVG conversion with editable vector paths.',
+      description:
+        'Paid AI-powered text-to-SVG and image-to-SVG conversion with editable vector paths.',
       websiteUrl: 'https://aisvg-generator.com',
     },
     {
@@ -82,10 +102,23 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
         'Generate an editable SVG from a text prompt. Returns a taskId and status; use get_svg_task to poll until the SVG is ready. Requires a paid VectorMint account and deducts credits.',
       inputSchema: z
         .object({
-          requestId: z.string().uuid().describe('A client-generated UUID used as an idempotency key. Reuse it only for retries of the same input.'),
-          prompt: z.string().min(1).max(1600).describe('Describe the vector artwork to create.'),
-          style: z.enum(['illustration', 'icon', 'logo', 'line-art']).describe('Visual style.'),
-          aspect: z.enum(['1:1', '4:3', '3:4']).describe('SVG canvas aspect ratio.'),
+          requestId: z
+            .string()
+            .uuid()
+            .describe(
+              'A client-generated UUID used as an idempotency key. Reuse it only for retries of the same input.'
+            ),
+          prompt: z
+            .string()
+            .min(1)
+            .max(1600)
+            .describe('Describe the vector artwork to create.'),
+          style: z
+            .enum(['illustration', 'icon', 'logo', 'line-art'])
+            .describe('Visual style.'),
+          aspect: z
+            .enum(['1:1', '4:3', '3:4'])
+            .describe('SVG canvas aspect ratio.'),
         })
         .strict(),
     },
@@ -95,7 +128,10 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
         const credentials = seeApiCredentials(await getAllConfigs());
         if (!credentials)
           return toolResult(
-            { error: 'service_unavailable', message: 'SVG generation is temporarily unavailable.' },
+            {
+              error: 'service_unavailable',
+              message: 'SVG generation is temporarily unavailable.',
+            },
             true
           );
         const result = await startSvgGeneration({
@@ -124,13 +160,19 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
         const task = await ownedSvgTask(taskId, userId);
         if (!task)
           return toolResult(
-            { error: 'task_not_found', message: 'No SVG task was found for this account.' },
+            {
+              error: 'task_not_found',
+              message: 'No SVG task was found for this account.',
+            },
             true
           );
         const credentials = seeApiCredentials(await getAllConfigs());
         if (!credentials && !['success', 'failed'].includes(task.status))
           return toolResult(
-            { error: 'service_unavailable', message: 'SVG generation status is temporarily unavailable.' },
+            {
+              error: 'service_unavailable',
+              message: 'SVG generation status is temporarily unavailable.',
+            },
             true
           );
         const result = await refreshSvgGeneration(task, credentials!);
@@ -148,20 +190,36 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
         'Convert a PNG image into editable SVG vector paths. Accepts a base64-encoded PNG (maximum 512×512 pixels) and returns the SVG. Requires a paid VectorMint account and deducts credits.',
       inputSchema: z
         .object({
-          requestId: z.string().uuid().describe('A client-generated UUID used as an idempotency key. Reuse it only for retries of the same input.'),
-          image: z.string().min(1).max(1_500_000).describe('Base64-encoded PNG image, without a data URL prefix.'),
-          colors: z.union([z.literal(4), z.literal(8), z.literal(16)]).describe('Maximum number of output colors.'),
-          removeBackground: z.boolean().describe('Whether to remove a uniform edge background.'),
+          requestId: z
+            .string()
+            .uuid()
+            .describe(
+              'A client-generated UUID used as an idempotency key. Reuse it only for retries of the same input.'
+            ),
+          image: z
+            .string()
+            .min(1)
+            .max(1_500_000)
+            .describe('Base64-encoded PNG image, without a data URL prefix.'),
+          colors: z
+            .union([z.literal(4), z.literal(8), z.literal(16)])
+            .describe('Maximum number of output colors.'),
+          removeBackground: z
+            .boolean()
+            .describe('Whether to remove a uniform edge background.'),
         })
         .strict(),
     },
     async ({ requestId, image, colors, removeBackground }) => {
       try {
-        if ((await getBalance(userId)) < SVG_IMAGE_CREDITS)
+        const id = 'image_' + (await svgIdentityHash(userId + ':' + requestId));
+        if (
+          (await getBalance(userId)) < SVG_IMAGE_CREDITS &&
+          !(await ownedSvgTask(id, userId))
+        )
           throw new TaskBillingError('insufficient_credits');
         const input = parseImageInput({ image, colors, removeBackground });
         const svg = await traceImage(input);
-        const id = 'image_' + (await svgIdentityHash(userId + ':' + requestId));
         const options = JSON.stringify({
           imageHash: await svgIdentityHash(input.image),
           colors: input.colors,
@@ -181,7 +239,7 @@ function createSvgMcpServer(userId: string, paidOrderId: string) {
           taskId: task.id,
           status: task.status,
           credits: task.costCredits,
-          svg: task.taskResult ? JSON.parse(task.taskResult).svg : svg,
+          svg: await archivedTaskSvg(task),
         });
       } catch (error) {
         return toolError(error);
@@ -210,7 +268,10 @@ export async function handleSvgMcp(request: Request) {
     const match = /^Bearer (\S+)$/i.exec(authorization);
     if (!match)
       return new Response(
-        JSON.stringify({ error: 'A VectorMint API key is required in the Authorization: Bearer header.' }),
+        JSON.stringify({
+          error:
+            'A VectorMint API key is required in the Authorization: Bearer header.',
+        }),
         {
           status: 401,
           headers: {

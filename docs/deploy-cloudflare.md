@@ -5,7 +5,8 @@ Production: https://aisvg-generator.com
 - GitHub repository: `zyrliuwei-sys/svgai`, production branch `main`.
 - Worker: `svgai`, account `d7c3d8fa2229ed65b03fd28fc8659989`.
 - D1: `svgai`, binding `DB`, database ID `359821ff-63dc-414d-b9f9-55b7982269a3`.
-- R2: `svgai`; credentials and CDN settings remain encrypted in the D1 admin configuration.
+- Public uploads R2: `svgai`. Its credentials and CDN settings remain in the D1 admin configuration.
+- Generated artwork R2: private `svgai-generated`, bound as `SVG_ARCHIVE`. Keep both the r2.dev URL and custom domains disabled for this bucket. Successful task SVGs are archived under `tasks/`. Free preview SVGs and color PNGs are archived under `previews/`. The app retains the D1 result for authorization, billing, and retry recovery.
 
 `cloudflare/production.json` contains public deployment configuration. `scripts/cloudflare.mjs` materializes the ignored root `wrangler.jsonc` from it, sets production build variables, builds the SQLite/D1 schema and Workers bundle, and deploys with Wrangler. A clean Git checkout therefore needs no manually copied configuration or local env file.
 

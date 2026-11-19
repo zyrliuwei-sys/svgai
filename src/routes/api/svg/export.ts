@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { archivedTaskSvg } from '@/server/svg-archive';
 import { ownedSvgTask } from '@/server/svg-generation';
 import { svgViewer, unlockPreview } from '@/server/svg-previews';
 
@@ -43,7 +44,7 @@ async function POST({ request }: { request: Request }) {
     if (body.previewId && viewer.preview?.id === body.previewId) {
       const task = await unlockPreview(viewer, viewer.preview!);
       return respData({
-        svg: JSON.parse(task.taskResult!).svg,
+        svg: await archivedTaskSvg(task),
         taskId: task.id,
         credits: task.costCredits,
       });
@@ -52,7 +53,7 @@ async function POST({ request }: { request: Request }) {
       const task = await ownedSvgTask(body.taskId, viewer.userId);
       if (task?.status === 'success' && task.taskResult)
         return respData({
-          svg: JSON.parse(task.taskResult).svg,
+          svg: await archivedTaskSvg(task),
           taskId: task.id,
           credits: task.costCredits,
         });
