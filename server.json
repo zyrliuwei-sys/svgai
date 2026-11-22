@@ -1,0 +1,26 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.zyrliuwei-sys/aisvg-generator-admin",
+  "title": "AI SVG Generator Admin MCP",
+  "description": "Admin tools for managing the AI SVG Generator site. Requires a scoped admin bearer token.",
+  "repository": {
+    "url": "https://github.com/zyrliuwei-sys/svgai",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "websiteUrl": "https://aisvg-generator.com",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://aisvg-generator.com/api/admin/agent/mcp",
+      "headers": [
+        {
+          "name": "Authorization",
+          "description": "Bearer token issued to an authorized site-admin agent.",
+          "isRequired": true,
+          "isSecret": true
+        }
+      ]
+    }
+  ]
+}

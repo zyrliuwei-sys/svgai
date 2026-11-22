@@ -1,0 +1,39 @@
+name: Publish MCP metadata
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - server.json
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install pinned MCP Publisher
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --retry 3 \
+            https://github.com/modelcontextprotocol/registry/releases/download/v1.8.11/mcp-publisher_linux_amd64.tar.gz \
+            --output /tmp/mcp-publisher.tar.gz
+          echo "99fbd857ae2277e5e4a4a2cddc7f4d3e64612c6f90950f44584c3539c9df854f  /tmp/mcp-publisher.tar.gz" | sha256sum --check -
+          tar -xzf /tmp/mcp-publisher.tar.gz mcp-publisher
+          chmod +x mcp-publisher
+
+      - name: Authenticate with GitHub Actions OIDC
+        run: ./mcp-publisher login github-oidc
+
+      - name: Validate and publish
+        run: |
+          ./mcp-publisher validate ./server.json
+          ./mcp-publisher publish ./server.json
