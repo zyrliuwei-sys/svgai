@@ -40,7 +40,11 @@ export function SvgWorkflow() {
         <p>
           {m['svgai.seo.how_context']()}{' '}
           <Link href="/how-it-works">{m['svgai.seo.how_link']()}</Link>{' '}
-          {m['svgai.seo.how_context_end']()}
+          {m['svgai.seo.how_context_end']()} {m['svgai.seo.guide_context']()}{' '}
+          <Link href="/blog/artificial-intelligence-svg-generator">
+            {m['svgai.seo.guide_link']()}
+          </Link>
+          .
         </p>
       </div>
       <ol className="svgai-workflow">

@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 
 import { Link, useRouter } from '@/core/i18n/navigation';
 import { envConfigs } from '@/config';
+import { SITE_URL } from '@/config/site';
 import { productPageHead } from '@/lib/seo';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages.js';
@@ -64,6 +65,10 @@ export const Route = createFileRoute('/blog/$slug')({
       path: `/blog/${encodeURIComponent(post.slug)}`,
       title: `${post.title} | ${envConfigs.app_name}`,
       description: post.description,
+      image:
+        post.source === 'local' && post.image
+          ? new URL(post.image, SITE_URL).href
+          : undefined,
       article: { publishedAt: post.createdAt, author: post.authorName },
     });
   },
@@ -267,7 +272,9 @@ function BlogPostPage() {
           {post.image && (
             <img
               src={post.image}
-              alt={post.title}
+              alt={post.imageDetails?.alt ?? post.title}
+              width={post.imageDetails?.width}
+              height={post.imageDetails?.height}
               className="border-border mb-8 w-full rounded-2xl border object-cover"
             />
           )}

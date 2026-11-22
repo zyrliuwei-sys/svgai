@@ -11,7 +11,9 @@ import { baseLocale } from '@/paraglide/runtime.js';
  * fetched through the server functions in ./server.ts and merged with the
  * local posts via the pure helpers below.
  */
-export const BLOG_POST_SLUGS: readonly string[] = [];
+export const BLOG_POST_SLUGS: readonly string[] = [
+  'artificial-intelligence-svg-generator',
+];
 
 export type BlogPostMeta = {
   title: string;
@@ -20,6 +22,7 @@ export type BlogPostMeta = {
   author_name?: string;
   author_image?: string;
   image?: string;
+  image_details?: { alt: string; width: number; height: number };
 };
 
 type PostModule = {
@@ -42,6 +45,8 @@ export type BlogPost = {
 };
 
 export type BlogPostDetail = BlogPost & {
+  /** Intrinsic dimensions and alternative text for a local cover. */
+  imageDetails?: BlogPostMeta['image_details'];
   /** Raw markdown — set for database posts */
   content?: string;
   /** An unpublished guest post shown to its author or a reviewer. */

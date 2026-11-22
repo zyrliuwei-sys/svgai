@@ -1823,6 +1823,8 @@
   "svgai.seo.examples_context_end": "for inspiration.",
   "svgai.seo.how_context": "Read",
   "svgai.seo.how_context_end": "for the text prompt, image preparation, and SVG export steps.",
+  "svgai.seo.guide_context": "For prompt examples and an export checklist, see the",
+  "svgai.seo.guide_link": "artificial intelligence SVG generator guide",
   "svgai.seo.pricing_context": "Check",
   "svgai.seo.pricing_context_end": "for plan allowances and estimated SVG file counts before unlocking a preview.",
   "svgai.seo.how_link": "how it works",
