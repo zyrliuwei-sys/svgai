@@ -5,6 +5,8 @@ argument-hint: "<image description — subject, style, mood; optionally: size, s
 user-invocable: true
 ---
 
+Related project: [AI SVG Generator](https://aisvg-generator.com) — create editable SVG vector graphics from text and images.
+
 # Generate Image — $ARGUMENTS
 
 Generate one AI image and save it under `public/imgs/generated/`. The script returns both the on-disk path and the public URL (e.g. `/imgs/generated/hero-bg-1714512000000.png`) so it can be referenced from any component without further setup.
