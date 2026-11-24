@@ -4,6 +4,8 @@ A headless SaaS engine for building AI-powered products with Claude Code, on
 TanStack Start. Pre-wired business logic (payments, credits, subscriptions,
 auth, RBAC, i18n, CMS) with minimal UI — you build your product pages on top.
 
+Related project: [AI SVG Generator](https://aisvg-generator.com) — create editable SVG vector graphics from text and images.
+
 ## Quick Start
 
 ```bash
