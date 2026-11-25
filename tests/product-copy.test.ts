@@ -14,7 +14,10 @@ test('published interface copy and downloadable admin instructions contain no up
     assert.doesNotMatch(String(value), /ship\s?any/i, key);
   }
   const skill = await readFile(
-    new URL('../.claude/skills/shipany-admin/SKILL.md', import.meta.url),
+    new URL(
+      '../.claude/skills/shipany-admin/admin-instructions.md',
+      import.meta.url
+    ),
     'utf8'
   );
   assert.doesNotMatch(skill, /ship\s?any/i);
