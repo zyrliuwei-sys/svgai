@@ -227,11 +227,11 @@ function BlogPostPage() {
         )}
         <article className="mx-auto max-w-3xl">
           <Link
-            href="/blog"
+            href={post.guide ? '/guides' : '/blog'}
             className="text-muted-foreground hover:text-foreground inline-flex items-center gap-2 text-sm font-medium transition-colors"
           >
             <ArrowLeft className="size-4" />
-            {m['blog.back_to_blog']()}
+            {post.guide ? m['guides.back']() : m['blog.back_to_blog']()}
           </Link>
 
           <header className="border-border mt-8 mb-6 border-b pb-6">

@@ -5,11 +5,18 @@ export const meta = {
   description:
     'Use an artificial intelligence SVG generator to create editable icons, logos, and illustrations. Get sample prompts and an SVG export checklist.',
   created_at: '2026-11-22',
+  guide: true,
   image: '/imgs/blog/artificial-intelligence-svg-generator/cover.webp',
   image_details: {
     alt: 'Paper airplane icon shown as an outline, a filled graphic, and a recolored variation',
     width: 1200,
     height: 630,
+  },
+  guide_example: {
+    src: '/imgs/blog/artificial-intelligence-svg-generator/outline-preview.webp',
+    alt: 'Botanical example with filled petals and leaves on the left and blue outlines on the right',
+    width: 733,
+    height: 564,
   },
 };
 
@@ -59,10 +66,7 @@ Use **Preview** to check the composition and colors. In the preview, drag the di
 
 <figure className="my-7">
   <img
-    src="/imgs/blog/artificial-intelligence-svg-generator/outline-preview.webp"
-    alt="Botanical example with filled petals and leaves on the left and blue outlines on the right"
-    width={733}
-    height={564}
+    {...meta.guide_example}
     loading="lazy"
     decoding="async"
     className="border-border w-full rounded-xl border"

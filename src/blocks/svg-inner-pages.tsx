@@ -48,9 +48,17 @@ function ToolPage({ image = false }: { image?: boolean }) {
                 : m['svgai.inner.text.detail_text']({ brand: brandName })}
             </p>
             {!image && (
-              <p className="svg-availability-note">
-                {m['svgai.inner.text.note']()}
-              </p>
+              <>
+                <p className="svg-availability-note">
+                  {m['svgai.inner.text.note']()}
+                </p>
+                <p>
+                  <Link href="/blog/text-to-svg-icon-set">
+                    {m['guides.icon_set_link']()}
+                    <ArrowRight size={15} aria-hidden="true" />
+                  </Link>
+                </p>
+              </>
             )}
             <Link href={image ? '/text-to-svg' : '/image-to-svg'}>
               {image ? m['svgai.seo.text_link']() : m['svgai.seo.image_link']()}

@@ -45,6 +45,16 @@ export const getBlogPostsFn = createServerFn()
     });
   });
 
+export const getGuidesFn = createServerFn()
+  .validator((data: { locale: string; limit?: number }) => data)
+  .handler(({ data: { locale, limit } }) =>
+    mergePosts(
+      [],
+      getLocalPosts(locale).filter((post) => post.guide),
+      { limit }
+    )
+  );
+
 /**
  * Single blog post by slug: database first, local MDX as fallback.
  * Local posts return meta only — the route component resolves the MDX
@@ -87,6 +97,7 @@ export const getBlogPostFn = createServerFn()
       authorName: meta.author_name,
       authorImage: meta.author_image,
       source: 'local',
+      guide: meta.guide,
     };
   });
 

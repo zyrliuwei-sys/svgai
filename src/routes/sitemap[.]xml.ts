@@ -11,6 +11,7 @@ const STATIC_PATHS = [
   '/examples',
   '/how-it-works',
   '/pricing',
+  '/guides',
   '/blog',
   '/guest-post',
   '/privacy-policy',

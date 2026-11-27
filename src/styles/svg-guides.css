@@ -1,0 +1,240 @@
+/* Editorial specimen layout for the SVG guide collection. */
+.guide-shelf {
+  --guide-mat: color-mix(in oklch, var(--svg-tint) 44%, var(--card));
+  --guide-selection: color-mix(
+    in oklch,
+    var(--svg-tint) 60%,
+    var(--background)
+  );
+  --guide-preview-ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(1rem, 2vw, 1.75rem);
+}
+
+.guide-preview {
+  min-width: 0;
+  margin: 0;
+  scroll-margin-block: 5.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background: var(--card);
+}
+
+.guide-preview-art {
+  position: relative;
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  place-items: center;
+  aspect-ratio: 17 / 10;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  overflow: hidden;
+  isolation: isolate;
+  border-radius: 0.7rem 0.7rem 0 0;
+  background-color: var(--guide-mat);
+  background-image:
+    linear-gradient(to right, var(--svg-grid) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--svg-grid) 1px, transparent 1px);
+  background-position: center;
+  background-size: 1.25rem 1.25rem;
+}
+
+.guide-preview-art img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  object-fit: contain;
+  animation: guide-preview-enter 220ms var(--guide-preview-ease) both;
+}
+
+.guide-preview-art > p {
+  padding: 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.5vw, 2rem);
+  text-align: center;
+}
+
+.guide-preview-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  justify-content: space-between;
+  padding: 0.625rem 0.875rem;
+  border-top: 1px solid var(--border);
+}
+
+.guide-preview-switch {
+  display: flex;
+  padding: 0.1875rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--background);
+}
+
+.guide-preview-switch button {
+  min-height: 2.25rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: calc(var(--radius) - 2px);
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.guide-preview-switch button:hover {
+  color: var(--foreground);
+}
+
+.guide-preview-switch button[aria-pressed='true'] {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.guide-preview-read {
+  display: inline-flex;
+  min-height: 2.625rem;
+  align-items: center;
+  gap: 0.375rem;
+  margin-inline-start: auto;
+  color: var(--svg-accent);
+  font-size: 0.875rem;
+  font-weight: 650;
+  text-decoration-color: currentColor;
+  text-underline-offset: 0.25em;
+  white-space: nowrap;
+}
+
+.guide-preview-read:hover {
+  text-decoration-line: underline;
+}
+
+.guide-shelf-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-shelf-list li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(0.5rem, 1.4vw, 1rem);
+  padding: clamp(0.625rem, 1.2vw, 1rem);
+  border: 1px solid transparent;
+  border-radius: 0.625rem;
+}
+
+.guide-shelf-list li[data-selected='true'] {
+  border-color: var(--border);
+  background: var(--guide-selection);
+  box-shadow: inset 3px 0 var(--svg-accent);
+}
+
+.guide-shelf-thumbnail {
+  position: relative;
+  display: grid;
+  width: clamp(3.75rem, 5.3vw, 5rem);
+  aspect-ratio: 4 / 3;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+
+.guide-shelf-thumbnail:hover,
+.guide-shelf-thumbnail[aria-pressed='true'] {
+  border-color: var(--svg-accent);
+}
+
+.guide-shelf-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.guide-shelf-thumbnail-caption {
+  position: absolute;
+  inset-inline-end: 0;
+  inset-block-end: 0;
+  padding: 0.1875rem;
+  border-start-start-radius: 0.25rem;
+  color: var(--foreground);
+  background: var(--card);
+}
+
+.guide-shelf-thumbnail[aria-pressed='true'] .guide-shelf-thumbnail-caption {
+  color: var(--primary-foreground);
+  background: var(--primary);
+}
+
+.guide-shelf-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.5rem;
+  border-radius: var(--radius);
+  color: var(--foreground);
+}
+
+.guide-shelf-link > svg {
+  margin-top: 0.1875rem;
+  color: var(--svg-accent);
+}
+
+.svgai-page .guide-shelf-copy :is(h2, h3) {
+  font-size: clamp(1.0625rem, 1.63vw, 1.3125rem);
+  font-weight: 650;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  text-wrap: pretty;
+}
+
+.guide-shelf-link:hover :is(h2, h3) {
+  text-decoration-line: underline;
+  text-decoration-color: var(--svg-accent);
+  text-underline-offset: 0.16em;
+}
+
+.guide-shelf-copy p {
+  margin-top: 0.4375rem;
+  color: var(--muted-foreground);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+
+@media (min-width: 56rem) {
+  .guide-shelf {
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, 1fr);
+  }
+
+  .guide-preview {
+    position: sticky;
+    top: 6.25rem;
+  }
+}
+
+@media (pointer: coarse) {
+  .guide-preview-switch button,
+  .guide-preview-read {
+    min-height: 2.75rem;
+  }
+}
+
+@keyframes guide-preview-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.1875rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

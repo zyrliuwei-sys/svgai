@@ -12,6 +12,8 @@ import { baseLocale } from '@/paraglide/runtime.js';
  * local posts via the pure helpers below.
  */
 export const BLOG_POST_SLUGS: readonly string[] = [
+  'svg-shape-generator',
+  'text-to-svg-icon-set',
   'artificial-intelligence-svg-generator',
 ];
 
@@ -23,6 +25,8 @@ export type BlogPostMeta = {
   author_image?: string;
   image?: string;
   image_details?: { alt: string; width: number; height: number };
+  guide?: true;
+  guide_example?: { src: string; alt: string; width: number; height: number };
 };
 
 type PostModule = {
@@ -35,18 +39,19 @@ export type BlogPost = {
   title: string;
   description: string;
   image?: string;
+  imageDetails?: BlogPostMeta['image_details'];
   /** ISO date string — serializable across loader/server-fn boundaries */
   createdAt: string;
   authorName?: string;
   authorImage?: string;
   source: 'local' | 'db';
+  guide?: true;
+  guideExample?: BlogPostMeta['guide_example'];
   /** A paid guest post: shown with a Sponsored label, links rel="sponsored". */
   sponsored?: boolean;
 };
 
 export type BlogPostDetail = BlogPost & {
-  /** Intrinsic dimensions and alternative text for a local cover. */
-  imageDetails?: BlogPostMeta['image_details'];
   /** Raw markdown — set for database posts */
   content?: string;
   /** An unpublished guest post shown to its author or a reviewer. */
@@ -88,10 +93,13 @@ function localPostToItem(slug: string, meta: BlogPostMeta): BlogPost {
     title: meta.title,
     description: meta.description,
     image: meta.image,
+    imageDetails: meta.image_details,
     createdAt: new Date(meta.created_at).toISOString(),
     authorName: meta.author_name,
     authorImage: meta.author_image,
     source: 'local',
+    guide: meta.guide,
+    guideExample: meta.guide_example,
   };
 }
 

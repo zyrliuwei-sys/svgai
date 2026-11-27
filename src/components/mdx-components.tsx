@@ -82,6 +82,15 @@ export const mdxComponents: MDXComponents = {
       {...props}
     />
   ),
+  pre: ({ className, ...props }: HTMLAttributes<HTMLPreElement>) => (
+    <pre
+      className={cn(
+        'border-border bg-muted my-5 overflow-x-auto rounded-xl border p-4 font-mono leading-relaxed [&_code]:bg-transparent [&_code]:p-0',
+        className
+      )}
+      {...props}
+    />
+  ),
   code: ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
     <code
       className={cn(

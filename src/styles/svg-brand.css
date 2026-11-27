@@ -622,6 +622,7 @@
   }
   .svgai-page .svgai-header-inner {
     height: 66px;
+    gap: 8px;
   }
   .svgai-page .svgai-desktop-nav {
     display: none;
@@ -802,7 +803,27 @@
     font-size: 38px;
   }
 }
+@media (pointer: coarse), (max-width: 760px) {
+  .svg-auth-form [data-slot='input'] {
+    min-height: 44px;
+    font-size: 16px;
+  }
+  .svg-auth-form [data-slot='button'] {
+    min-height: 44px;
+  }
+}
 @media (max-width: 374px) {
+  .svgai-page .svgai-header-inner {
+    width: calc(100% - 24px);
+  }
+  .svgai-page .svgai-header-inner .svgai-brand {
+    gap: 6px;
+    font-size: 22px;
+  }
+  .svgai-page .svgai-header-inner .svgai-brand img {
+    width: 26px;
+    height: 26px;
+  }
   .svgai-page .svg-hero h1 {
     font-size: 35px;
   }
@@ -813,8 +834,11 @@
     padding-inline: 11px;
     gap: 7px;
   }
-  .svgai-page .svgai-theme-button {
-    width: 30px;
+  .svgai-page .svgai-sign-in > svg {
+    display: none;
+  }
+  .svgai-page .svgai-account-placeholder {
+    width: 66px;
   }
   .svg-inner-intro h1 {
     font-size: 36px;

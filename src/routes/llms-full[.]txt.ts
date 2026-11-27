@@ -1,12 +1,18 @@
 import { createFileRoute } from '@tanstack/react-router';
 
 import { envConfigs } from '@/config';
+import { m } from '@/paraglide/messages.js';
 import { baseLocale } from '@/paraglide/runtime.js';
 import { getLocalPosts, mergePosts } from '@/content/posts';
 
 const STATIC_PAGES: { path: string; title: string; description: string }[] = [
   { path: '', title: 'Home', description: 'Landing page' },
   { path: '/pricing', title: 'Pricing', description: 'Pricing plans' },
+  {
+    path: '/guides',
+    title: m['guides.title']({}, { locale: baseLocale }),
+    description: m['guides.description']({}, { locale: baseLocale }),
+  },
   { path: '/blog', title: 'Blog', description: 'Blog posts and articles' },
 ];
 

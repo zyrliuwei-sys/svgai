@@ -1,0 +1,78 @@
+import { Link } from '../../core/i18n/navigation';
+
+export const meta = {
+  title: 'SVG Shape Generator Guide: Stars, Badges, and Blobs',
+  description:
+    'Create editable stars, shield badges, and organic blobs with an SVG shape generator. Copy three prompts and learn when to use exact vector coordinates.',
+  created_at: '2026-11-27',
+  guide: true,
+  image: '/imgs/blog/svg-shape-generator/cover.webp',
+  image_details: {
+    alt: 'Cobalt star, mountain shield badge, and mint organic blob on a drafting grid',
+    width: 1200,
+    height: 630,
+  },
+  guide_example: {
+    src: '/imgs/blog/svg-shape-generator/geometry-study.webp',
+    alt: 'Three SVG geometry studies showing a ten-vertex star, a shield badge, and a smooth asymmetric blob',
+    width: 1200,
+    height: 650,
+  },
+};
+
+An SVG shape generator helps you make shapes you can resize and edit, including stars for labels, shield badges for illustrations, and organic blobs for backgrounds. Start with a text prompt when you want to explore silhouettes. When a design has an exact point count, radius, or size, verify the geometry in a vector editor or specify the coordinates directly in SVG.
+
+To follow along, open the <Link href="/#generator" className="text-primary font-medium underline underline-offset-4">SVG generator on the VectorMint homepage</Link>. Use **Text to SVG**, then choose the style and canvas ratio for the shape you want.
+
+## How to describe an SVG shape
+
+Start with one shape. Say whether it should be symmetrical, how many colors it needs, and where it will appear. Center a small badge or icon with padding. For a background shape, describe how it should fill the frame and where nearby text needs clear space.
+
+<figure className="my-7">
+  <img
+    {...meta.guide_example}
+    loading="lazy"
+    decoding="async"
+    className="border-border w-full rounded-xl border"
+  />
+  <figcaption className="text-muted-foreground mt-2 text-sm">
+    Reference artwork showing three different silhouettes and the geometry to
+    inspect in each one.
+  </figcaption>
+</figure>
+
+## 1. Make a five-point SVG star
+
+Choose **Icon** and a square canvas. A plain silhouette reads well on a label or small button.
+
+> A centered five-point star for a small interface label, with one point straight up, evenly spaced tips, a solid cobalt fill, and generous transparent padding. No text, shadow, or sparkle marks.
+
+Count the outer tips in **Preview**. Move the divider toward **Color** to reveal more of the **Outline** and check for stray paths. For exact dimensions, this standalone 96 × 96 example places five outer tips and five inner corners on one `<polygon>`.
+
+```svg
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96">
+  <polygon fill="#2851DA" points="48,8 60,32 86,36 67,54 72,80 48,68 24,80 29,54 10,36 36,32" />
+</svg>
+```
+
+## 2. Make a shield badge
+
+Choose **Logo** and specify which element belongs inside the shield. Reserve enough space around the motif to keep it clear at small sizes.
+
+> A centered shield badge with rounded shoulders and a pointed base. Put two simple mountain peaks inside, using navy and warm yellow flat fills. Keep a clear gap between the peaks and the edge. Transparent background, no lettering.
+
+Shrink the preview to the size where the badge will appear. If the mountains merge into the border, widen the gap or simplify the peaks. Open the SVG in a vector editor and confirm that the motif is selectable separately when you need to recolor it.
+
+## 3. Make an organic blob for a background
+
+Choose **Illustration** and a landscape canvas if the blob will sit behind a wide section. Keep the requested color and its edge treatment simple.
+
+> One wide, asymmetric mint blob for the right side of a website banner. Give it a broad curved top edge, a smaller bulge lower right, and one smooth inward bend. Use a flat fill and leave the surrounding canvas transparent.
+
+Check the outline at the final crop size. Keep the large curves and smooth out any unexpected bumps. If the shape sits behind text, check readability after you place the text on top.
+
+## When to edit the SVG geometry directly
+
+Use the **Code** tab or open the exported file in a vector editor when production requirements are precise. A `<polygon>` explicitly lists its vertices. A `<path>` describes a more flexible outline, including curves. For a fixed-size UI asset, verify the bounding box, spacing, and contrast at the displayed size before shipping it.
+
+If you are building a set of UI symbols from these shapes, use the <Link href="/blog/text-to-svg-icon-set" className="text-primary font-medium underline underline-offset-4">text-to-SVG icon guide</Link> to keep their stroke weight, padding, and corners consistent.

@@ -3,8 +3,10 @@ import { createFileRoute } from '@tanstack/react-router';
 import { brandName } from '@/config/brand';
 import { productPageHead } from '@/lib/seo';
 import { m } from '@/paraglide/messages.js';
+import { getLocale } from '@/paraglide/runtime.js';
 import { FAQ } from '@/blocks/faq';
 import { Footer } from '@/blocks/footer';
+import { Guides } from '@/blocks/guides';
 import { Header } from '@/blocks/header';
 import { Hero } from '@/blocks/hero';
 import { Pricing } from '@/blocks/pricing';
@@ -16,8 +18,11 @@ import {
   SvgUseCases,
 } from '@/blocks/svg-story';
 import { SvgWorkflow } from '@/blocks/svg-workflow';
+import { getGuidesFn } from '@/content/posts/server';
 
 function HomePage() {
+  const guides = Route.useLoaderData();
+
   return (
     <div className="svgai-page">
       <Header />
@@ -31,6 +36,7 @@ function HomePage() {
         <Pricing headingLevel={2} />
         <FAQ />
         <SvgClosing />
+        <Guides guides={guides} />
       </main>
       <Footer />
     </div>
@@ -38,6 +44,7 @@ function HomePage() {
 }
 
 export const Route = createFileRoute('/')({
+  loader: () => getGuidesFn({ data: { locale: getLocale(), limit: 3 } }),
   head: () =>
     productPageHead({
       path: '/',

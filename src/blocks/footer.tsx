@@ -44,6 +44,10 @@ export function Footer() {
           </div>
           <div className="svgai-footer-links">
             <h3>{m['svgai.marketing.footer_information']()}</h3>
+            <Link href="/guides">
+              {m['guides.nav']()}
+              <ArrowUpRight size={12} />
+            </Link>
             <Link href="/blog">
               {m['landing.footer.blog']()}
               <ArrowUpRight size={12} />

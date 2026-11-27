@@ -1,0 +1,69 @@
+import { Link } from '../../core/i18n/navigation';
+
+export const meta = {
+  title: 'Text to SVG: 6 Prompts for a Consistent UI Icon Set',
+  description:
+    'Use six text-to-SVG prompts for matching search, bookmark, notification, folder, download, and settings icons. Check line weight and spacing before export.',
+  created_at: '2026-11-27',
+  guide: true,
+  image: '/imgs/blog/text-to-svg-icon-set/cover.webp',
+  image_details: {
+    alt: 'Six cobalt outline icons on matching grids for search, bookmark, notifications, files, download, and settings',
+    width: 1200,
+    height: 630,
+  },
+  guide_example: {
+    src: '/imgs/blog/text-to-svg-icon-set/icon-proof.webp',
+    alt: 'A reference proof of six interface icons on equal grids with common stroke weight and spacing',
+    width: 1200,
+    height: 650,
+  },
+};
+
+The quickest way to build a consistent icon set with text to SVG is to keep the style instructions fixed and change only the object in each prompt. Begin with one reference icon, then compare each new SVG at the size where people will actually use it. This guide uses **24 px toolbar icons** and six common app actions.
+
+Open the <Link href="/#generator" className="text-primary font-medium underline underline-offset-4">SVG generator on the VectorMint homepage</Link> or go straight to <Link href="/text-to-svg" className="text-primary font-medium underline underline-offset-4">Text to SVG</Link>. Select **Icon** and a **square** canvas. You will describe the symbols you want to draw, such as a bell or a folder.
+
+## Start with one shared style prompt
+
+Use the same opening sentence for all six icons. Append just one subject from the next section for each generation.
+
+> One centered outline icon for a 24 px app toolbar. Uniform stroke with rounded caps and joins, a single dark navy color, clear 2 px padding, and a transparent background. Keep it readable at small sizes. No lettering, gradients, or shadows.
+
+Generate the search icon first because its simple geometry makes stroke width and padding easy to judge. Use a screenshot or an exported SVG from that first draft as your design reference when comparing the rest of the set.
+
+## Six subject prompts to pair with the shared style
+
+1. **Search.** A round magnifying glass with one short diagonal handle pointing down and right. Keep the lens empty.
+2. **Bookmark.** An upright ribbon with slightly rounded top corners and a shallow V-shaped cutout at the bottom.
+3. **Notifications.** A simple bell with an open dome silhouette and one small clapper. Keep the center empty.
+4. **Folder.** A low rectangular folder with one tab on the upper left and slightly rounded corners.
+5. **Download.** A downward arrow centered above a shallow open tray. Leave a visible gap between the arrow and tray.
+6. **Settings.** A compact gear with six broad teeth and one circular opening in the middle. Leave space around the center.
+
+<figure className="my-7">
+  <img
+    {...meta.guide_example}
+    loading="lazy"
+    decoding="async"
+    className="border-border w-full rounded-xl border"
+  />
+  <figcaption className="text-muted-foreground mt-2 text-sm">
+    Reference icon set built on the same grid. Compare the cap shape, stroke
+    weight, and breathing room around each symbol.
+  </figcaption>
+</figure>
+
+## Compare the SVGs at toolbar size
+
+Put the icons in one row of equally sized squares in a browser or vector editor. Inspect the row at **24 px** and at the smallest size your interface uses. Check the gaps inside the bell and gear, the separation between the arrow and tray, and the padding around the folder.
+
+Two icons with the same numeric bounds can still look different in size. A square folder often appears larger than a thin bookmark of the same height. Adjust the shapes by eye after the grid and stroke weight match. Change one property at a time so you can see what improved.
+
+## Normalize the files before you ship
+
+Open each exported SVG and check its `viewBox`. If your icon system requires `0 0 24 24`, scale the artwork into that coordinate space using your vector editor and check that no edges clip. For stroke-based icons, verify the same stroke width, cap, and join across the set. For icons made from filled outlines, compare their apparent line thickness at the target size.
+
+Use a single color variable in your interface where possible, and try every icon against your light and dark themes. Give icon-only buttons accessible names that describe the action, such as **Download file** or **Open settings**.
+
+If you need a star, shield, or organic silhouette for the same interface, the <Link href="/blog/svg-shape-generator" className="text-primary font-medium underline underline-offset-4">SVG shape generator guide</Link> has three prompts and a precise SVG star example.

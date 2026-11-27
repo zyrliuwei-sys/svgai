@@ -14,9 +14,13 @@
   color: var(--muted-foreground);
   font-size: 10px;
   white-space: nowrap;
+  pointer-events: none;
 }
 .svg-paywall {
   max-width: min(480px, calc(100vw - 32px));
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 35px;
   gap: 0;
   background: var(--card);
@@ -695,6 +699,12 @@
   }
 }
 @media (max-width: 760px) {
+  .svg-preview-lock {
+    bottom: 65px;
+  }
+  .svg-paywall {
+    padding: 24px;
+  }
   .svgai-page .svg-prompt-box textarea {
     font-size: 16px;
     line-height: 1.65;
@@ -832,6 +842,8 @@
       .svgai-icon-button,
       .svgai-sign-in,
       .svg-expand-button,
+      .svg-copy-button,
+      .svg-remove-file,
       .svg-zoom-controls button,
       .svg-curve-caption button
     ) {
@@ -842,13 +854,24 @@
     :is(
       .svg-prompt-suggestions button,
       .svg-output-tabs button,
-      .svg-copy-button,
-      .svg-option-row select
+      .svg-download-button,
+      .svg-option-row select,
+      .svg-browse-button,
+      .svg-text-button,
+      .svg-checkbox
     ) {
     min-height: 40px;
   }
   .svgai-page .svg-option-row select {
     font-size: 16px;
+  }
+  .svgai-page .svg-copy-button {
+    justify-content: center;
+  }
+  .svgai-page .svg-remove-file {
+    display: grid;
+    place-items: center;
+    inset: 4px 4px auto auto;
   }
   .svgai-page
     :is(
